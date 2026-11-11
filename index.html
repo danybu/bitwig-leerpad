@@ -189,7 +189,7 @@ details.ex.new{background:transparent;border-radius:0;padding:0}
    in je privé-repo danybu/bitwig-voortgang (GitHub). Per toestel vul je één keer een GitHub-token in.
    Het nieuwste wint: bij openen en bij terugkeren naar de pagina wordt opgehaald, na elke wijziging bewaard. */
 (function(){
-  var KEYS=/^(bitwig-leerpad-gezien|leerpad-afgewerkt-|bw-quiz-v1|sc-view|leerpad-alles|leerpad-hl-|leerpad-sc-mark)/, STAMP='leerpad-sync-stamp',
+  var KEYS=/^(bitwig-leerpad-gezien|leerpad-afgewerkt-|bw-quiz-v1|sc-view|leerpad-alles|leerpad-hl-|leerpad-hlc-|leerpad-sc-mark)/, STAMP='leerpad-sync-stamp',
       TOK='leerpad-gh-token', REPO='danybu/bitwig-voortgang', PATH='voortgang.json',
       API='https://api.github.com/repos/'+REPO+'/contents/'+PATH;
   function ls(){try{return window.localStorage}catch(e){return null}}
@@ -334,7 +334,7 @@ details.ex.new{background:transparent;border-radius:0;padding:0}
     put(MK,M);paint();
   },true);
 
-  /* ---------------- markeringen in de tekst ---------------- */
+  /* ---------------- markeringen en notities in de tekst ---------------- */
   var SKIP='.lp-x,.qz,.vg,script,style,button,input,select,textarea,.mk-btns,.hl-pop';
   function texts(root){
     var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
@@ -343,15 +343,16 @@ details.ex.new{background:transparent;border-radius:0;padding:0}
   function full(nodes){return nodes.map(function(n){return n.data}).join('')}
   function sectionOf(node){var el=node.nodeType===1?node:node.parentElement;return el&&el.closest('main section.page, main section, main')}
   function offsetIn(nodes,node,off){var t=0;for(var i=0;i<nodes.length;i++){if(nodes[i]===node)return t+off;t+=nodes[i].data.length}return -1}
-  function wrap(sec,start,end,id){
-    var nodes=texts(sec),t=0;
+  function wrap(sec,start,end,id,cls){
+    var nodes=texts(sec),t=0,last=null;
     nodes.forEach(function(n){
       var a=t,b=t+n.data.length;t=b;
       if(b<=start||a>=end)return;
       var s=Math.max(start,a)-a,e=Math.min(end,b)-a;if(e<=s)return;
       var r=n;if(s>0)r=r.splitText(s);if(e-s<r.data.length)r.splitText(e-s);
-      var m=document.createElement('mark');m.className='hl';m.dataset.h=id;r.parentNode.insertBefore(m,r);m.appendChild(r);
+      var m=document.createElement('mark');m.className=cls;m.dataset.h=id;r.parentNode.insertBefore(m,r);m.appendChild(r);last=m;
     });
+    return last;
   }
   function locate(sec,h){
     var txt=full(texts(sec)),best=-1,score=-1,i=txt.indexOf(h.t);
@@ -359,42 +360,124 @@ details.ex.new{background:transparent;border-radius:0;padding:0}
       if(p===h.p)sc+=2;if(x===h.x)sc+=2;if(sc>score){score=sc;best=i}i=txt.indexOf(h.t,i+1)}
     return best;
   }
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   var H=get(HK,[]);
   function secById(id){return id?document.getElementById(id):document.querySelector('main')}
-  function restore(){H.forEach(function(h){var s=secById(h.s);if(!s)return;var i=locate(s,h);if(i>=0)wrap(s,i,i+h.t.length,h.id)})}
-  function unwrap(id){document.querySelectorAll('mark.hl[data-h="'+id+'"]').forEach(function(m){var p=m.parentNode;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()})}
+  function noteEl(h){
+    var n=document.createElement('span');n.className='lp-note lp-x';n.dataset.h=h.id;
+    n.innerHTML='<span class="lp-note-i">✎</span><span class="lp-note-t">'+esc(h.n||'')+'</span>';return n}
+  function place(h,edit){
+    var s=secById(h.s);if(!s)return;var i=locate(s,h);if(i<0)return;
+    var last=wrap(s,i,i+h.t.length,h.id,h.n!==undefined?'nt':'hl');
+    if(h.n!==undefined&&last){var n=noteEl(h);last.parentNode.insertBefore(n,last.nextSibling);if(edit)openEditor(n)}
+  }
+  function restore(){H.forEach(function(h){place(h)});indicators()}
+  function unwrap(id){
+    document.querySelectorAll('.lp-note[data-h="'+id+'"]').forEach(function(n){n.remove()});
+    document.querySelectorAll('mark[data-h="'+id+'"]').forEach(function(m){var p=m.parentNode;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()})}
+  function remove(id){H=get(HK,[]).filter(function(h){return h.id!==id});put(HK,H);unwrap(id);indicators()}
+
+  // notitie bewerken: een tekstvak op de plek zelf
+  function openEditor(n){
+    if(n.querySelector('textarea'))return;
+    var id=n.dataset.h,h=get(HK,[]).filter(function(x){return x.id===id})[0]||{n:''};
+    n.classList.add('edit');
+    n.innerHTML='<textarea rows="3" placeholder="Je notitie …">'+esc(h.n||'')+'</textarea>'+
+      '<span class="lp-note-b"><button type="button" data-n="ok">Bewaar</button><button type="button" data-n="del">Verwijder</button></span>';
+    var ta=n.querySelector('textarea');ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);
+    ta.addEventListener('keydown',function(e){if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();saveNote(n)}if(e.key==='Escape'){e.preventDefault();closeEditor(n)}});
+  }
+  function closeEditor(n){
+    var id=n.dataset.h,h=get(HK,[]).filter(function(x){return x.id===id})[0];
+    if(!h||!(h.n||'').trim()){remove(id);return}
+    var r=noteEl(h);n.replaceWith(r)}
+  function saveNote(n){
+    var id=n.dataset.h,v=n.querySelector('textarea').value.trim();
+    if(!v){remove(id);return}
+    H=get(HK,[]);H.forEach(function(h){if(h.id===id)h.n=v});put(HK,H);closeEditor(n);indicators()}
 
   var MAIN=document.querySelector('main');
   var pop=document.createElement('div');pop.className='hl-pop lp-x';pop.hidden=true;
   ['mousedown','pointerdown','touchstart'].forEach(function(ev){pop.addEventListener(ev,function(e){e.preventDefault()},{passive:false})});
   function showPop(rect,html,fn){pop.innerHTML=html;pop.hidden=false;pop.onclick=function(e){e.preventDefault();var b=e.target.closest('button');if(b)fn(b.dataset.a)};
     var x=rect.left+rect.width/2+window.scrollX,y=rect.top+window.scrollY-44;
-    pop.style.left=Math.max(8,Math.min(x-60,document.documentElement.clientWidth-130))+'px';pop.style.top=(y<window.scrollY+4?rect.bottom+window.scrollY+8:y)+'px'}
+    pop.style.left=Math.max(8,Math.min(x-90,document.documentElement.clientWidth-200))+'px';pop.style.top=(y<window.scrollY+4?rect.bottom+window.scrollY+8:y)+'px'}
   function hidePop(){pop.hidden=true}
+  function anchorFrom(r){
+    var sec=sectionOf(r.startContainer);
+    if(!sec||sec!==sectionOf(r.endContainer)||!MAIN.contains(sec))return null;
+    var el=r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer:r.commonAncestorContainer.parentElement;
+    if(el.closest(SKIP))return null;
+    if(r.startContainer.nodeType!==3||r.endContainer.nodeType!==3)return null;
+    var nodes=texts(sec),a=offsetIn(nodes,r.startContainer,r.startOffset),b=offsetIn(nodes,r.endContainer,r.endOffset);
+    if(a<0||b<=a)return null;
+    var txt=full(nodes),t=txt.slice(a,b);if(!t.trim())return null;
+    return {s:sec.id||'',t:t,p:txt.slice(Math.max(0,a-32),a),x:txt.substr(b,32)};
+  }
+  function create(an,note){
+    var h={id:'h'+Date.now().toString(36),s:an.s,t:an.t,p:an.p,x:an.x};if(note)h.n='';
+    H=get(HK,[]);H.push(h);put(HK,H);
+    place(h,note);indicators();
+  }
   var pending=null;
   function onSel(){
     if(!MAIN)return;
     var s=window.getSelection();if(!s||s.isCollapsed||!s.rangeCount){if(pending){pending=null;hidePop()}return}
-    var r=s.getRangeAt(0),sec=sectionOf(r.startContainer);
-    if(!sec||sec!==sectionOf(r.endContainer)||!MAIN.contains(sec)){hidePop();return}
-    var el=r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer:r.commonAncestorContainer.parentElement;
-    if(el.closest(SKIP))return;
-    var nodes=texts(sec),a=offsetIn(nodes,r.startContainer,r.startOffset),b=offsetIn(nodes,r.endContainer,r.endOffset);
-    if(r.startContainer.nodeType!==3||r.endContainer.nodeType!==3||a<0||b<=a)return;
-    var txt=full(nodes),t=txt.slice(a,b);if(!t.trim())return;
-    pending={s:sec.id||'',t:t,p:txt.slice(Math.max(0,a-32),a),x:txt.substr(b,32),a:a,b:b,sec:sec};
-    showPop(r.getBoundingClientRect(),'<button type="button" data-a="add">🖍 Markeer</button>',function(){
-      var id='h'+Date.now().toString(36);H=get(HK,[]);H.push({id:id,s:pending.s,t:pending.t,p:pending.p,x:pending.x});put(HK,H);
-      wrap(pending.sec,pending.a,pending.b,id);pending=null;s.removeAllRanges();hidePop()});
+    var an=anchorFrom(s.getRangeAt(0));if(!an){hidePop();return}
+    pending=an;
+    showPop(s.getRangeAt(0).getBoundingClientRect(),'<button type="button" data-a="hl">🖍 Markeer</button><button type="button" data-a="nt">✎ Notitie</button>',function(a){
+      var an=pending;pending=null;s.removeAllRanges();hidePop();if(an)create(an,a==='nt')});
+  }
+  // Alt-klik (Mac: ⌥-klik) in de tekst: meteen een notitie bij het woord waar je klikt
+  function wordAt(x,y){
+    var r=null;
+    if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(x,y);
+    else if(document.caretPositionFromPoint){var p=document.caretPositionFromPoint(x,y);if(p){r=document.createRange();r.setStart(p.offsetNode,p.offset)}}
+    if(!r||r.startContainer.nodeType!==3)return null;
+    var n=r.startContainer,d=n.data,i=r.startOffset,a=i,b=i;
+    while(a>0&&/\S/.test(d[a-1]))a--;while(b<d.length&&/\S/.test(d[b]))b++;
+    if(b<=a)return null;var w=document.createRange();w.setStart(n,a);w.setEnd(n,b);return w;
   }
   var tm=null;document.addEventListener('selectionchange',function(){clearTimeout(tm);tm=setTimeout(onSel,250)});
   document.addEventListener('click',function(e){
-    var m=e.target.closest('mark.hl');
+    var n=e.target.closest('.lp-note');
+    if(n){var b=e.target.closest('button[data-n]');
+      if(b){e.preventDefault();if(b.dataset.n==='ok')saveNote(n);else remove(n.dataset.h);return}
+      if(!n.classList.contains('edit'))openEditor(n);return}
+    if(e.altKey&&MAIN&&MAIN.contains(e.target)&&!e.target.closest('a,button,input,textarea,.lp-x')){
+      var w=wordAt(e.clientX,e.clientY),an=w&&anchorFrom(w);if(an){e.preventDefault();window.getSelection().removeAllRanges();create(an,true)}return}
+    var m=e.target.closest('mark.hl,mark.nt');
     if(m&&window.getSelection().isCollapsed){
-      var id=m.dataset.h;showPop(m.getBoundingClientRect(),'<button type="button" data-a="del">Verwijder markering</button>',function(){
-        H=get(HK,[]).filter(function(h){return h.id!==id});put(HK,H);unwrap(id);hidePop()});return}
+      var id=m.dataset.h,isN=m.classList.contains('nt');
+      showPop(m.getBoundingClientRect(),isN?'<button type="button" data-a="edit">✎ Bewerk notitie</button><button type="button" data-a="del">Verwijder</button>':'<button type="button" data-a="del">Verwijder markering</button>',function(a){
+        hidePop();if(a==='del')remove(id);else{var nn=document.querySelector('.lp-note[data-h="'+id+'"]');if(nn)openEditor(nn)}});return}
     if(!e.target.closest('.hl-pop')&&!pending)hidePop();
   });
+  document.addEventListener('focusout',function(e){var n=e.target.closest&&e.target.closest('.lp-note.edit');
+    if(n)setTimeout(function(){if(document.body.contains(n)&&!n.contains(document.activeElement))saveNote(n)},150)});
+
+  /* ---------------- icoontje bij delen en pagina's met markeringen of notities ---------------- */
+  function indicators(){
+    // in de inhoudstafel van dit hoofdstuk (ook ==markeringen== uit de md-bestanden)
+    document.querySelectorAll('.toc li[data-p]').forEach(function(li){
+      var sec=document.getElementById(li.dataset.p),c=sec?sec.querySelectorAll('mark').length:0,nt=sec?sec.querySelectorAll('.lp-note').length:0;
+      var ic=li.querySelector('.lp-ind');
+      if(!c&&!nt){if(ic)ic.remove();return}
+      if(!ic){ic=document.createElement('span');ic.className='lp-ind lp-x';(li.querySelector('a')||li).appendChild(ic)}
+      ic.textContent=nt?'📝':'🖍';ic.title=(c?c+' markering(en)':'')+(c&&nt?', ':'')+(nt?nt+' notitie(s)':'');
+    });
+    // aantal voor dit hoofdstuk bewaren, voor de inhoudspagina
+    if(MAIN){var tot=MAIN.querySelectorAll('mark').length+MAIN.querySelectorAll('.lp-note').length,k='leerpad-hlc-'+PAGE,old=L.getItem(k)||'0';
+      if(String(tot)!==old){if(tot)L.setItem(k,String(tot));else L.removeItem(k)}}
+    // op de inhoudspagina: bij elk hoofdstuk
+    document.querySelectorAll('a.chap-a').forEach(function(a){
+      var pg=(a.getAttribute('href')||'').split('/').pop().replace(/\.html.*$/,''),n=+(L.getItem('leerpad-hlc-'+pg)||0),nt=get('leerpad-hl-'+pg,[]).filter(function(h){return h.n}).length;
+      var host=a.querySelector('strong')||a,ic=host.querySelector('.lp-ind');
+      if(!n){if(ic)ic.remove();return}
+      if(!ic){ic=document.createElement('span');ic.className='lp-ind lp-x';host.appendChild(ic)}
+      ic.textContent=nt?'📝':'🖍';ic.title=n+' markering(en) of notitie(s)';
+    });
+  }
 
   var css=document.createElement('style');css.textContent=
     '.mk-btns{display:inline-flex;gap:2px;margin-left:6px;vertical-align:middle;opacity:.35;transition:opacity .15s}'+
@@ -404,8 +487,18 @@ details.ex.new{background:transparent;border-radius:0;padding:0}
     '.mk-b>td:first-child .sc-f,.mk-b .pk-f,.mk-b .sk-f,.fn-n.mk-b{font-weight:700}.mk-b .sc-f::before,.mk-b .pk-f::before,.mk-b .sk-f::before{content:"★ ";color:#e0a800}'+
     'tr.mk-v,li.mk-v,.fn-n.mk-v{opacity:.4}tr.mk-v .sc-f,li.mk-v .pk-f,li.mk-v .sk-f,.fn-n.mk-v{text-decoration:line-through}'+
     'mark.hl{background:#ffe27a;color:inherit;border-radius:2px;cursor:pointer;padding:0}@media (prefers-color-scheme:dark){mark.hl{background:#7a6514}}'+
-    '.hl-pop{position:absolute;z-index:9999;background:#222;border-radius:8px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.3)}'+
-    '.hl-pop button{font:600 .85rem/1.2 system-ui,sans-serif;color:#fff;background:transparent;border:0;padding:6px 10px;cursor:pointer;white-space:nowrap}';
+    'mark.nt{background:transparent;color:inherit;border-bottom:2px dotted #e09a00;cursor:pointer;padding:0}'+
+    '.lp-note{display:inline-block;max-width:100%;vertical-align:baseline;margin:0 4px;padding:1px 8px;background:#fff6c4;border:1px solid #e9cf5a;border-radius:6px;'+
+      'font:500 .85em/1.45 var(--body,system-ui),sans-serif;color:#4a3b00;cursor:pointer;white-space:pre-wrap;text-indent:0}'+
+    '.lp-note-i{margin-right:5px;opacity:.7}.lp-note.edit{display:block;margin:6px 0;padding:6px;cursor:default}'+
+    '.lp-note textarea{display:block;width:100%;box-sizing:border-box;font:inherit;font-size:1rem;color:inherit;background:#fffdf0;border:1px solid #e9cf5a;border-radius:4px;padding:6px;resize:vertical}'+
+    '.lp-note-b{display:flex;gap:6px;margin-top:5px}.lp-note-b button{font:600 .8rem/1 system-ui,sans-serif;padding:6px 12px;border-radius:5px;border:1px solid #c9a800;background:#ffd54a;color:#3a2e00;cursor:pointer}'+
+    '.lp-note-b button[data-n=del]{background:transparent;border-color:#ccc;color:#888}'+
+    '@media (prefers-color-scheme:dark){.lp-note{background:#4a4010;border-color:#8a7420;color:#ffeaa0}.lp-note textarea{background:#2e2808}}'+
+    '.lp-ind{margin-left:6px;font-size:.85em;text-decoration:none!important;font-weight:400}'+
+    '.hl-pop{position:absolute;z-index:9999;background:#222;border-radius:8px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.3);display:flex}'+
+    '.hl-pop button{font:600 .85rem/1.2 system-ui,sans-serif;color:#fff;background:transparent;border:0;padding:6px 10px;cursor:pointer;white-space:nowrap}'+
+    '.hl-pop button+button{border-left:1px solid #444}';
   document.head.appendChild(css);
   function init(){document.body.appendChild(pop);paint();restore()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
