@@ -1,0 +1,790 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Note FX · Toonhoogte en toonsoort · Bitwig-leerpad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+<style>:root{--bg:#f4f3ec;--surface:#fff;--panel:#e8e6dc;--ink:#232323;--muted:#6b6a64;--line:#dcd9cd;--accent:#ff5a00;--accent-ink:#c84600;
+ --x:#7a3fd1;--b:#ff5a00;--a:#1f7a5a;--new:#eef4ff;--newline:#9fbbec;--chk:#fff4d6;--chkline:#e6c66b;
+ --body:Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--mono:ui-monospace,"SF Mono",Menlo,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1b1a;--surface:#242422;--panel:#2b2a27;--ink:#ecebe6;--muted:#a5a39b;--line:#3a3935;--accent:#ff6a1a;--accent-ink:#ff8a4d;--new:#1b2433;--newline:#3a5689;--chk:#2c2615;--chkline:#7a6626;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1b1a;--surface:#242422;--panel:#2b2a27;--ink:#ecebe6;--muted:#a5a39b;--line:#3a3935;--accent:#ff6a1a;--accent-ink:#ff8a4d;--new:#1b2433;--newline:#3a5689;--chk:#2c2615;--chkline:#7a6626;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.7}
+a{color:var(--accent-ink);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1440px;margin:0 auto;padding:0 16px}
+.band{background:var(--accent);color:#fff;font-size:1rem;padding:14px 0}
+.band a{color:#fff;font-weight:500}.band span{opacity:.7;margin:0 6px}
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr) 250px;gap:40px;padding-top:36px;padding-bottom:80px}
+.toc{position:sticky;top:16px;align-self:start;background:var(--panel);padding:12px 16px 16px;font-size:.88rem;line-height:1.45;max-height:calc(100vh - 32px);overflow:auto}
+.toc-h{font-weight:700;margin:0 0 6px;color:var(--ink)}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc li a{display:flex;gap:8px;align-items:baseline;padding:4px 0;color:var(--accent-ink)}
+.toc li.cur a{font-weight:700}
+.mark{flex:0 0 14px;height:14px;border:1.5px solid var(--muted);border-radius:50%;transform:translateY(2px);opacity:.6}
+.toc li.cur .mark{border-color:var(--accent);opacity:1;background:radial-gradient(var(--accent) 35%,transparent 40%)}
+.toc li.done .mark{border-color:var(--a);background:var(--a);opacity:1}
+.toc li.done .mark::after{content:"✓";color:#fff;font-size:10px;display:block;text-align:center;line-height:11px}
+.toc-prog{margin:12px 0 4px;font-weight:600;color:var(--ink)}
+.toc-all{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:.82rem}
+.toc-links{margin:12px 0 0;font-size:.82rem;line-height:1.7}
+.toc-links .playall{font-weight:600}
+#prog{color:var(--muted);font-family:var(--mono);font-size:.75rem}
+main{max-width:760px;min-width:0}
+h1{font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--accent);line-height:1.2;margin:0 0 18px}
+h2{font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:900;line-height:1.3;margin:0 0 16px}
+h3{font-size:1.3rem;font-weight:900;margin:28px 0 8px;line-height:1.3}
+p{margin:0 0 16px}
+strong{font-weight:700}
+.man{font-size:.72rem;font-weight:500;margin-left:10px;vertical-align:middle;white-space:nowrap}
+ul.def{margin:0 0 18px;padding-left:22px}ul.def li{margin:6px 0}
+kbd{font-family:var(--mono);font-size:.78em;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--surface);white-space:nowrap}
+table.keys{border-collapse:collapse;width:100%;margin:8px 0 18px;font-size:.9rem;line-height:1.5}
+table.keys th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:2px solid var(--line)}
+table.keys td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.keys td:first-child{width:38%}
+.small{font-size:.88rem;color:var(--muted)}
+figure{margin:18px 0 22px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);background:#f4f3ec}
+figure.pair{display:grid;grid-template-columns:1fr;gap:10px}
+figure.pair figcaption{grid-column:1/-1}
+figure a{display:block}
+figcaption{font-size:.85rem;color:var(--muted);margin-top:6px;line-height:1.5}
+.figtag{display:inline-block;font-size:.7rem;font-weight:600;border:1px solid var(--line);border-radius:3px;padding:0 5px;margin-left:4px;white-space:nowrap}
+ul.clips{list-style:none;margin:6px 0 22px;padding:10px 14px;border-left:4px solid var(--accent);background:var(--surface)}
+ul.clips li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:4px 0;line-height:1.5}
+ul.clips li a{font-weight:600;color:var(--ink)}
+ul.clips li.extra a{font-weight:400;color:var(--muted)}
+ul.clips .by{font-size:.76rem;color:var(--muted);flex-basis:100%;padding-left:28px}
+.play{color:var(--accent)}
+.seen{display:inline-flex}.seen input{width:16px;height:16px;margin:0 2px 0 0;accent-color:var(--a);cursor:pointer}
+li.done>a{text-decoration:line-through;color:var(--muted)}
+.toc li.done>a{text-decoration:none;color:var(--accent-ink)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.src{font-family:var(--mono);font-size:.66rem;font-weight:600;border:1px solid currentColor;border-radius:3px;padding:0 4px;margin-right:4px}
+.src-x{color:var(--x)}.src-b{color:var(--b)}
+aside{margin:8px 0 20px;padding:12px 16px;font-size:.92rem;line-height:1.6}
+aside strong{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+aside.bw6{background:var(--new);border-left:4px solid var(--newline)}
+aside.chk{background:var(--chk);border-left:4px solid var(--chkline)}
+.legend{font-size:.88rem;color:var(--muted)}
+section.page[hidden]{display:none}
+footer{border-top:1px solid var(--line);margin-top:30px;padding-top:12px;font-size:.82rem;color:var(--muted)}
+@media (max-width:900px){.keys-side{grid-column:1}.layout{grid-template-columns:1fr;gap:20px;padding-top:20px}.toc{position:static;max-height:none}figure.pair{grid-template-columns:1fr}table.keys td:first-child{width:auto}}
+
+.pager{margin-top:44px;border-top:2px solid var(--line);padding-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+body.allmode .pager,body.allmode .pstate{display:none}
+.fwd{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-block;font-weight:600;font-size:.95rem;padding:10px 18px;border:2px solid transparent;text-decoration:none!important;line-height:1.3}
+.btn.back{color:var(--accent-ink);padding-left:0}
+.btn.ghost{color:var(--muted);border-color:var(--line);background:transparent}
+.btn.ghost:hover{border-color:var(--muted);color:var(--ink)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);padding:12px 26px;font-size:1.05rem;font-weight:700}
+.btn.primary:hover{filter:brightness(1.06)}
+.pstate{font-size:.85rem;color:var(--a);margin-top:10px;min-height:1em}
+.keys-side{position:sticky;top:16px;align-self:start;font-size:.8rem;line-height:1.4;max-height:calc(100vh - 32px);overflow:auto}
+.sk-h{font-weight:700;margin:0 0 8px;font-size:.88rem}
+.sk ul{list-style:none;margin:0;padding:0}
+.sk li{padding:6px 0;border-bottom:1px solid var(--line)}
+.sk-f{display:block;color:var(--ink)}
+.sk-k{display:block;margin-top:3px}
+.sk-k kbd{margin:0 3px 2px 0;display:inline-block}
+.sk-none{color:var(--muted)}
+.sk-leg{color:var(--muted);margin-top:10px}
+.sk[hidden]{display:none}
+body.allmode .keys-side{display:none}
+kbd.cust{border:1.5px solid var(--accent)}
+@media (max-width:1200px){.layout{grid-template-columns:230px minmax(0,1fr)}.keys-side{grid-column:2;position:static;max-height:none}}
+figure a{cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:1000;background:rgba(15,15,14,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0}
+.lb[hidden]{display:none}
+.lb img{display:block;cursor:pointer;max-width:none;background:#f4f3ec}
+.lb-cap{color:#e8e6dc;font-size:.85rem;margin:6px 16px 0;text-align:center;min-height:1.4em}
+.lb-x{position:fixed;top:10px;right:14px;background:rgba(0,0,0,.65);border:0;border-radius:50%;width:44px;height:44px;color:#fff;font-size:1.8rem;line-height:44px;cursor:pointer;padding:0;z-index:2}
+.src-a{color:var(--a)}
+mark{background:#ffe27a;color:inherit;padding:0 2px}
+
+ol.def{margin:0 0 18px;padding-left:26px}ol.def li{margin:6px 0;padding-left:2px}ol.def li::marker{font-weight:700;color:var(--accent-ink)}
+.def .def{margin:4px 0 4px}
+
+/* ---- 23/10: leeslettertype, meer ruimte, sneltoetsen op hoogte en onderaan ---- */
+:root{--text:Inter,-apple-system,"Helvetica Neue",sans-serif}
+main{font-family:var(--text);font-size:17.5px;line-height:1.72;font-feature-settings:"cv11","ss01"}
+main p{margin:0 0 1.4em}
+main ul.def li,main ol.def li{margin:.55em 0}
+main ul.def,main ol.def{margin:0 0 1.5em}
+main h2{margin-bottom:22px}
+main h3{margin:2.1em 0 .6em}
+main h1,main h2,main h3,.man,.btn,.pstate,ul.clips,table.keys th,aside strong,figcaption,.figtag,.pk,table.sc,.sc-ctrl,.legend{font-family:var(--body)}
+main table.keys{font-size:.88rem}
+main aside{font-size:.95rem;margin:4px 0 1.6em}
+main figure{margin:1.6em 0 1.8em}
+ul.clips{font-size:.85rem;margin:4px 0 1.8em}
+kbd.sk-hl{background:var(--accent);color:#fff;border-color:var(--accent)}
+span.sk-hl{outline:2px solid var(--accent);outline-offset:2px}
+
+.keys-side{position:relative;top:auto;align-self:stretch;max-height:none;overflow:visible;font-family:var(--body)}
+.keys-side .sk ul{list-style:none;margin:0;padding:0}
+.keys-side .sk li{position:absolute;left:0;right:0;display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding:3px 0 3px 10px;border:0;border-left:2px solid var(--line);font-size:.78rem;line-height:1.35;transition:border-color .15s}
+.keys-side .sk li:hover,.keys-side .sk li.on{border-left-color:var(--accent)}
+.keys-side .sk-f{color:var(--muted);flex:1;min-width:0}
+.keys-side .sk li.on .sk-f{color:var(--ink)}
+.keys-side .sk-k{display:block;margin:0;white-space:nowrap;text-align:right}
+.keys-side .sk-k kbd{margin:0 0 0 3px}
+
+.pk{margin:3em 0 0;padding:18px 22px 14px;background:var(--surface);border-top:3px solid var(--accent)}
+.pk-h{font-weight:900;font-size:1.05rem;margin:0 0 6px}
+.pk-h span{font-weight:600;font-size:.75rem;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+.pk-cols{columns:2 280px;column-gap:36px}
+.pk-g{break-inside:avoid;margin:14px 0 4px}
+.pk-gh{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--accent-ink);margin:0 0 4px}
+.pk ul{list-style:none;margin:0;padding:0}
+.pk li{display:flex;align-items:baseline;gap:12px;padding:5px 0;border-bottom:1px dotted var(--line);font-size:.84rem;line-height:1.4;margin:0}
+.pk-f{flex:1;min-width:0}
+.pk-k{white-space:nowrap;text-align:right}
+.pk-k kbd{margin-left:3px}
+.pk-leg{font-size:.75rem;color:var(--muted);margin:12px 0 0}
+
+@media (max-width:1200px){.keys-side{display:none}}
+main table.keys td:first-child{width:auto}
+main table.keys td{font-size:.95em}
+
+/* 23/10 avond: toetsen in de lopende tekst ruimer; klein scherm zonder inhoudsbalk */
+main kbd:not(.cap){font-size:.8em;padding:.16em .55em .12em;margin:0 .12em;border-radius:5px;border-bottom-width:2px;line-height:1.5}
+@media (max-width:900px){.toc{display:none}.layout{padding-top:16px}}
+
+/* linkermenu: video's, lezen, eigen notities */
+.toc-more{margin-top:14px;border-top:1px solid var(--line);padding-top:6px}
+details.tm{border-bottom:1px solid var(--line)}
+details.tm summary{cursor:pointer;font-weight:700;padding:8px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--ink)}
+details.tm summary::-webkit-details-marker{display:none}
+details.tm summary::after{content:"▸";color:var(--muted);margin-left:6px}
+details.tm[open] summary::after{content:"▾"}
+details.tm summary span{font-weight:600;font-size:.75rem;color:var(--muted);margin-left:auto;margin-right:4px}
+.tm-sub{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:var(--muted);margin:8px 0 2px}
+ul.tm-l{list-style:none;margin:0 0 8px;padding:0}
+ul.tm-l li{padding:4px 0;font-size:.8rem;line-height:1.35}
+ul.tm-l li a{color:var(--accent-ink)}
+ul.tm-l li.done a{color:var(--muted);text-decoration:line-through}
+ul.tm-l .seen input{width:13px;height:13px;margin:0 4px 0 0;vertical-align:-2px}
+ul.tm-l .dur{color:var(--muted);font-size:.72rem;white-space:nowrap}
+ul.tm-l .src{font-size:.6rem}
+.src-p{color:#0f7c8c}.src-a{color:var(--a)}
+.tag{font-size:.6rem;font-weight:700;border-radius:3px;padding:0 3px;margin-left:3px}
+.tag.bw6{background:var(--new);color:#2a5bb5}.tag.opt{background:var(--panel);color:var(--muted)}
+/* alleen het kopje van een kader als blok; vet in de tekst blijft gewoon vet */
+aside strong{display:inline;font-size:inherit;text-transform:none;letter-spacing:0;margin:0}
+aside>strong:first-child{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+
+ul.tm-l li{position:relative;padding:5px 0 5px 20px}
+ul.tm-l li .seen{position:absolute;left:0;top:6px}
+
+/* kopbalk: duidelijk klikbaar */
+.band a{color:#fff;font-weight:600;text-decoration:underline;text-decoration-color:rgba(255,255,255,.55);text-underline-offset:4px}
+.band a:hover{text-decoration-color:#fff}
+
+/* voortgangsbalk */
+.vg{margin:10px 0 0;font-size:.78rem;line-height:1.5;color:var(--muted);font-family:var(--body)}
+.vg-t{font-weight:700;color:var(--ink)}
+.vg button{font:inherit;font-size:.78rem;font-weight:700;padding:3px 9px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent-ink);cursor:pointer;margin:3px 0}
+.vg-s.ok{color:var(--a);font-weight:600}.vg-s.bad{color:#c0392b;font-weight:600}
+.vg-x{display:block;font-size:.72rem}.vg-x a{color:var(--muted);text-decoration:underline}
+
+/* smal scherm (iPhone): één kolom over de hele breedte, zonder inhoud- en sneltoetsenkolom */
+@media (max-width:900px){
+ .layout{grid-template-columns:minmax(0,1fr)!important;gap:0;padding-top:14px}
+ .toc,.keys-side{display:none!important}
+ main{max-width:none;width:100%}
+ main table.keys,main table.sc{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ figure img{max-width:100%}
+ .pk-cols{columns:1}
+}
+
+main blockquote{margin:4px 0 1.6em;padding:12px 16px;background:var(--chk);border-left:4px solid var(--chkline);font-size:.95rem}
+
+/* eigen notitie */
+.own{margin:8px 0 1.8em;padding:14px 18px 6px;background:#f1ecfb;border-left:4px solid #7a3fd1}
+.own-h{font-family:var(--body);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a3fd1;margin:0 0 6px}
+.own h3{margin:.6em 0 .5em;font-size:1.1rem}
+.own table{background:var(--surface)}
+@media (prefers-color-scheme:dark){.own{background:#251d33}}
+
+/* SVG-schema's uit de handleiding niet reusachtig opblazen */
+figure img[src^="data:image/svg"]{width:auto!important;max-width:100%;max-height:60vh;display:block;margin:0 auto}
+
+table.sc{border-collapse:collapse;width:100%;font-size:.88rem;margin:6px 0 14px}
+table.sc th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:6px 6px;border-bottom:1px solid var(--line)}
+table.sc tr.sc-g th{padding-top:14px;color:var(--ink);font-size:.78rem}
+table.sc td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.sc td:nth-child(2){white-space:normal;width:38%}
+.sc-f{font-weight:500}.sc-uit{font-size:.78rem;color:var(--muted);margin-top:2px;max-width:60ch}
+.sc-anders,.sc-eigen,.sc-weg,.mine{font-size:.7rem;font-weight:600;border-radius:4px;padding:0 5px;margin-left:4px;white-space:nowrap}
+.sc-anders,.sc-eigen,.mine{background:#fde7d9;color:#9a3b0c}.sc-weg{background:#eee;color:#666}
+@media (prefers-color-scheme:dark){.sc-anders,.sc-eigen,.mine{background:#4a2a18;color:#ffb38a}.sc-weg{background:#333;color:#aaa}}
+td.fn{font-size:.78rem;color:var(--muted)}.fn-n{}
+.same{color:var(--muted)}.none{color:var(--muted);opacity:.6}
+@media (max-width:700px){table.sc td:nth-child(2),table.sc td:nth-child(3){white-space:normal}}
+
+kbd.cust{border:1.5px solid var(--accent);border-bottom-width:1.5px}
+.sc-ctrl{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;font-size:.85rem;margin:6px 0}
+.sc-ctrl select{font:inherit;font-size:.85rem}
+.sc-leg{color:var(--muted)}
+table.sc tr.sc-h1 th{padding-top:16px;color:var(--ink);font-size:.8rem}
+table.sc tr.sc-h2 th{padding-top:8px;padding-left:14px;font-size:.72rem}
+
+/* ---- keycaps: elke toets een eigen kadertje ---- */
+.combo{display:inline-flex;gap:4px;align-items:center;vertical-align:middle}
+kbd.cap{font-family:var(--body);font-weight:600;font-size:.82rem;line-height:1;min-width:1.9em;text-align:center;
+  padding:.42em .55em .38em;border:1px solid var(--line);border-bottom-width:2.5px;border-radius:6px;background:var(--surface);color:var(--ink);
+  white-space:nowrap;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+kbd.cap.mod{font-size:.9rem;padding:.36em .45em .32em;color:var(--muted)}
+kbd.cap.cust{border-color:var(--accent);border-bottom-color:var(--accent)}
+kbd.cap.cust.mod{color:var(--accent-ink)}
+kbd.cap.big{font-size:1.5rem;padding:.4em .7em .35em;border-radius:10px;border-bottom-width:4px;min-width:2.2em}
+kbd.cap.big.mod{font-size:1.6rem;padding:.33em .5em .3em}
+.or{font-size:.72rem;color:var(--muted);margin:0 4px}
+
+/* rechterkolom: groter, toets onder de naam als hij niet past */
+.keys-side .sk li{flex-wrap:wrap;gap:4px 10px;padding:6px 0 6px 12px;font-size:.8rem}
+.keys-side .sk-k{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;margin-left:auto}
+.keys-side kbd.cap{font-size:.9rem}
+.keys-side kbd.cap.mod{font-size:.98rem}
+
+/* onderste lijst: strak raster */
+.pk li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:7px 2px;min-height:40px;border-bottom:1px solid var(--line)}
+.pk li:last-child{border-bottom:0}
+.pk-g{background:var(--bg);border-radius:6px;padding:8px 12px 4px;margin:0 0 14px;break-inside:avoid}
+.pk-gh{border-bottom:2px solid var(--accent);padding-bottom:5px;margin-bottom:2px}
+.pk-k{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px}
+.pk-cols{column-gap:20px}
+.pk-leg kbd.cap{font-size:.7rem;min-width:1.6em}
+
+/* ---- oefenen ---- */
+.qz{margin:22px 0 0;border:1px solid var(--line);background:var(--surface);font-family:var(--body)}
+.qz-head{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:16px 20px}
+.qz-t{font-weight:900;font-size:1.05rem;margin:0}
+.qz-sub{margin:2px 0 0;font-size:.8rem;color:var(--muted)}
+.qz-sub kbd.cap{font-size:.7rem;padding:.25em .45em}
+.qz-btns{display:flex;gap:8px;flex-wrap:wrap}
+.qz-go{position:relative;overflow:hidden;font:inherit;font-weight:700;font-size:.9rem;padding:9px 16px 11px;border:2px solid var(--accent);background:var(--surface);color:var(--accent-ink);cursor:pointer}
+.qz-go:first-child,.qz-go.main{background:var(--accent);color:#fff}
+.qz-go b{font-weight:600;opacity:.8;margin-left:4px}
+.qz-meter{position:absolute;left:0;bottom:0;height:3px;width:var(--p,0);background:var(--a)}
+.qz.on .qz-head{border-bottom:1px solid var(--line)}
+.qz-stage{outline:none;position:relative}
+.qz-stage:not(:focus-within)::after{content:"Klik hier om verder te oefenen";position:absolute;inset:44px 0 0;display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb,var(--surface) 70%,transparent);font-weight:700;color:var(--accent-ink);cursor:pointer;backdrop-filter:blur(1px)}
+.qz-top{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--panel)}
+.qz-bar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-right:6px}
+.qz-bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.qz-pill{font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:12px;background:var(--surface);color:var(--muted);font-variant-numeric:tabular-nums}
+.qz-pill.hot{color:var(--accent-ink)}
+.qz-x{border:0;background:none;font-size:1.5rem;line-height:1;cursor:pointer;color:var(--muted);padding:0 4px}
+.qz-card{text-align:center;padding:22px 20px 18px}
+.qz-cat{width:120px;height:120px;object-fit:cover;border-radius:12px;display:block;margin:0 auto 10px}
+.qz-new{color:var(--accent);font-weight:900;font-size:1.1rem;margin:0 0 4px}
+.qz-stamp{display:inline-block;transform:rotate(-5deg);border:2px solid #7a3fd1;color:#7a3fd1;font-weight:900;font-size:.85rem;padding:3px 12px;border-radius:5px;margin:0 0 8px}
+.qz-g{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--muted);margin:0}
+.qz-name{font-size:clamp(1.4rem,3vw,2rem);font-weight:900;line-height:1.25;margin:4px 0 6px}
+.qz-hint{font-family:var(--text);font-style:italic;color:var(--muted);font-size:.92rem;max-width:52ch;margin:8px auto 0}
+.qz-sc{color:var(--muted);margin:0 0 14px}
+.qz-strip{padding:20px;background:var(--bg);border-top:1px solid var(--line)}
+.qz-strip.intro{background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.qz-strip.ok{background:var(--a);color:#fff}
+.qz-strip.bad{background:#c0392b;color:#fff}
+.qz-res{font-weight:900;font-size:1.4rem;margin:0 0 10px}
+.qz-ans{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:0 0 12px}
+.qz-ans kbd.cap{font-size:1.3rem;padding:.4em .65em .35em;border-radius:9px;border-bottom-width:3px}
+.qz-ans kbd.cap.mod{font-size:1.4rem}
+.qz-strip.ok .qz-res,.qz-strip.ok .qz-ans{justify-content:center;text-align:center}
+.qz-strip.bad .qz-ans span{font-weight:700;opacity:.85}
+.qz-in{min-height:84px;display:flex;align-items:center;justify-content:center}
+.qz-ph{color:var(--muted);font-size:1.05rem}
+.qz-strip.bad .qz-ph{color:rgba(255,255,255,.6)}
+.qz-in.shake{animation:qzshake .35s}
+@keyframes qzshake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.qz-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.qz-row.c{justify-content:center}
+.qz-tip{font-size:.78rem;color:var(--muted)}
+.qz-strip.bad .qz-tip{color:rgba(255,255,255,.7)}
+.qz-b{font:inherit;font-size:.85rem;font-weight:700;padding:8px 16px;border-radius:20px;border:0;background:color-mix(in srgb,var(--ink) 10%,transparent);color:inherit;cursor:pointer}
+.qz-b:disabled{opacity:.4;cursor:default}
+.qz-b.main{background:var(--accent);color:#fff;padding:10px 24px}
+.qz-lab{display:block;font-size:.78rem;font-weight:700;margin:12px 0 6px;opacity:.85}
+.qz-hint-in{width:100%;font:inherit;font-size:.9rem;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.qz-strip.bad .qz-hint-in{border-color:rgba(255,255,255,.4);margin-bottom:4px}
+.pk li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px}
+.pk-f{flex:1 1 11em}
+.pk-k{margin-left:auto}
+
+details.f1{margin:18px 0;border:1px solid var(--line);border-left:4px solid #7a7a7a;background:var(--surface,#fff);padding:0 16px}
+details.f1 summary{cursor:pointer;font-weight:700;padding:10px 0;list-style:none;display:flex;justify-content:space-between;gap:10px}
+details.f1 summary::-webkit-details-marker{display:none}
+details.f1 summary span{font-weight:400;color:var(--muted);font-size:.85em}
+details.f1 dl{margin:0 0 8px}details.f1 dt{font-weight:700;margin-top:10px}
+details.f1 dd{margin:2px 0 0 0;font-size:.95em}details.f1 dd p{margin:2px 0}details.f1 dd ul{margin:4px 0 4px 18px}
+details.f1 .f1-d{font-style:italic;margin:4px 0 8px}details.f1 .f1-src{font-size:.8em;color:var(--muted);border-top:1px solid var(--line);padding-top:6px}
+</style></head><body data-chapter="ch19a">
+<div class="band"><div class="wrap"><a href="../index.html#ch19a">Bitwig-leerpad</a> <span>›</span> <a href="#intro">Hoofdstuk 19a.1</a></div></div>
+<div class="wrap layout">
+<nav class="toc" aria-label="Inhoud"><p class="toc-h">Inhoud</p><ol><li data-p="intro"><a href="#intro"><span class="mark" aria-hidden="true"></span>Inleiding</a></li><li data-p="transpose"><a href="#transpose"><span class="mark" aria-hidden="true"></span>Note Transpose</a></li><li data-p="keyfilter"><a href="#keyfilter"><span class="mark" aria-hidden="true"></span>Key Filter+</a></li><li data-p="map"><a href="#map"><span class="mark" aria-hidden="true"></span>Transpose Map en Harmonize</a></li><li data-p="micropitch"><a href="#micropitch"><span class="mark" aria-hidden="true"></span>Micro-pitch</a></li><li data-p="bend"><a href="#bend"><span class="mark" aria-hidden="true"></span>Bend</a></li></ol>
+<p class="toc-prog" id="donecount"></p>
+<label class="toc-all"><input type="checkbox" id="showall"> alles op één pagina</label>
+<p class="toc-links"><a class="playall" href="https://danybu.github.io/clipspeler/?c=a1MzBKd_44U%3A40%3A140%3ABasis++octaven%2C+halve+tonen+en+fine%7Ca1MzBKd_44U%3A140%3A265%3AModuleren+met+automation%2C+Steps+of+een+LFO%7CzSNLgWrHw0A%3A0%3A49%3AWat+het+device+doet%7CzSNLgWrHw0A%3A59%3A158%3AModus+Filter++noten+buiten+de+toonladder+weglaten%7CzSNLgWrHw0A%3A158%3A268%3AVerschuiven+binnen+de+toonladder%7CzSNLgWrHw0A%3A268%3A338%3AModus+Constrain++naar+de+volgende+noot+in+de+toonladder%7CiSW08E1XaI8%3A0%3A434%3AKennismaking++noten+hertunen%2C+toonladders+importeren%2C+modulatie%7C_Sm573jmEQs%3A48%3A194%3APresets++historische+stemmingen+en+theorie+%28rein%2C+otonaal%2C+utonaal%29%7C2oP92pTmmOM%3A350%3A380%3AKennismaking+%28tijden+bij+benadering%29%7CN1TInqvU228%3A0%3A74%3ABasis++een+bend+bij+elke+nieuwe+noot%7CN1TInqvU228%3A74%3A168%3AHoeveelheid+%28tot+%C2%B148+halve+tonen%29+en+curve%7CN1TInqvU228%3A168%3A226%3ADuur+in+ms+of+16e+noten%7CN1TInqvU228%3A284%3A363%3AOffset+%28in+de+handleiding++Pre-delay%29&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener">▶ Alle 13 hoofdclips (24 min)</a><br><a href="../MANUAL_PLUS/Ch19_Device_Descriptions.html">Handleiding 5.3, hfst. 19</a><br><span id="prog"></span></p><div class="toc-more"><details class="tm"><summary>Video's <span>24</span></summary><p class="tm-sub">Gebruikt in dit hoofdstuk</p><ul class="tm-l"><li><label class="seen"><input type="checkbox" data-key="v-a1MzBKd_44U"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=a1MzBKd_44U" target="_blank" rel="noopener">Note Transpose</a> <span class="dur">7:15</span></li><li><label class="seen"><input type="checkbox" data-key="v-zSNLgWrHw0A"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=zSNLgWrHw0A" target="_blank" rel="noopener">Diatonic Transposer / Key Filter</a> <span class="dur">11:45</span></li><li><label class="seen"><input type="checkbox" data-key="v-iSW08E1XaI8"><span class="vh">Bekeken</span></label><span class="src src-b">Bitwig</span> <a href="https://www.youtube.com/watch?v=iSW08E1XaI8" target="_blank" rel="noopener">Micro-pitch device</a> <span class="dur">7:14</span></li><li><label class="seen"><input type="checkbox" data-key="v-_Sm573jmEQs"><span class="vh">Bekeken</span></label><span class="src src-b">Bitwig</span> <a href="https://www.youtube.com/watch?v=_Sm573jmEQs" target="_blank" rel="noopener">On Microtuning (Micro-Pitch Device)</a> <span class="dur">12:21</span></li><li><label class="seen"><input type="checkbox" data-key="v-2oP92pTmmOM"><span class="vh">Bekeken</span></label><span class="src src-b">Bitwig</span> <a href="https://www.youtube.com/watch?v=2oP92pTmmOM" target="_blank" rel="noopener">New Note FX in Bitwig Studio 4.1</a> <span class="dur">7:31</span></li><li><label class="seen"><input type="checkbox" data-key="v-N1TInqvU228"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=N1TInqvU228" target="_blank" rel="noopener">Bend</a> <span class="dur">9:13</span></li></ul><p class="tm-sub">Overzicht</p><ul class="tm-l"><li><label class="seen"><input type="checkbox" data-key="v-ByQUnwopgbo"><span class="vh">Bekeken</span></label><span class="src src-a">Alex Reid</span> <a href="https://www.youtube.com/watch?v=ByQUnwopgbo" target="_blank" rel="noopener">The Fun Begins Here: Exploring Bitwig&#x27;s Most Playful Note FX Devices</a> <span class="dur">7:57</span></li><li><label class="seen"><input type="checkbox" data-key="v-fHAsVjGpbHs"><span class="vh">Bekeken</span></label><span class="src src-b">Bitwig</span> <a href="https://www.youtube.com/watch?v=fHAsVjGpbHs" target="_blank" rel="noopener">Making Beats With Bitwig Studio Note FX</a> <span class="dur">6:51</span></li></ul><p class="tm-sub">Timing, velocity &amp; willekeur</p><ul class="tm-l"><li><label class="seen"><input type="checkbox" data-key="v-yIVfmh6SDNw"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=yIVfmh6SDNw" target="_blank" rel="noopener">Velocity Curve</a> <span class="dur">8:32</span></li><li><label class="seen"><input type="checkbox" data-key="v-AdQ_9WgxBx0"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=AdQ_9WgxBx0" target="_blank" rel="noopener">Humanize</a> <span class="dur">12:07</span></li><li><label class="seen"><input type="checkbox" data-key="v-bAlEJVYWXvM"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=bAlEJVYWXvM" target="_blank" rel="noopener">Understanding the Randomize device</a> <span class="dur">10:38</span></li></ul><p class="tm-sub">Akkoorden &amp; vasthouden</p><ul class="tm-l"><li><label class="seen"><input type="checkbox" data-key="v-GYt2GnJuPqo"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=GYt2GnJuPqo" target="_blank" rel="noopener">Latch</a> <span class="dur">9:16</span></li><li><label class="seen"><input type="checkbox" data-key="v-xmWUD9GvT2E"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=xmWUD9GvT2E" target="_blank" rel="noopener">Multi Note</a> <span class="dur">11:58</span></li><li><label class="seen"><input type="checkbox" data-key="v-u2bZVvPICVk"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=u2bZVvPICVk" target="_blank" rel="noopener">Strum</a> <span class="dur">11:11</span></li></ul><p class="tm-sub">Arpeggiator</p><ul class="tm-l"><li><label class="seen"><input type="checkbox" data-key="v-NvRXvFtZXBI"><span class="vh">Bekeken</span></label><span class="src src-a">Alex Reid</span> <a href="https://www.youtube.com/watch?v=NvRXvFtZXBI" target="_blank" rel="noopener">Transform Your Music with Bitwig&#x27;s Arpeggiator</a> <span class="dur">8:10</span></li><li><label class="seen"><input type="checkbox" data-key="v-eB82ZvbDFeQ"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=eB82ZvbDFeQ" target="_blank" rel="noopener">How to use the Arpeggiator device</a> <span class="dur">17:21</span></li><li><label class="seen"><input type="checkbox" data-key="v-Dm-A_S8M1ws"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=Dm-A_S8M1ws" target="_blank" rel="noopener">Arpeggiator (oude versie)</a> <span class="dur">15:39</span><span class="tag opt">opt.</span></li></ul><p class="tm-sub">Herhalen &amp; generatief</p><ul class="tm-l"><li><label class="seen"><input type="checkbox" data-key="v--LMc8SIvQtQ"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=-LMc8SIvQtQ" target="_blank" rel="noopener">Note Repeats</a> <span class="dur">14:47</span></li><li><label class="seen"><input type="checkbox" data-key="v-MyndBUh3eEQ"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=MyndBUh3eEQ" target="_blank" rel="noopener">Note Echo</a> <span class="dur">27:00</span></li><li><label class="seen"><input type="checkbox" data-key="v-wWfD3sRBD9w"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=wWfD3sRBD9w" target="_blank" rel="noopener">Dribble</a> <span class="dur">9:23</span></li><li><label class="seen"><input type="checkbox" data-key="v-fBDmkmVcTBk"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=fBDmkmVcTBk" target="_blank" rel="noopener">Ricochet</a> <span class="dur">13:05</span></li><li><label class="seen"><input type="checkbox" data-key="v-VpmA_Bb3CH8"><span class="vh">Bekeken</span></label><span class="src src-b">Bitwig</span> <a href="https://www.youtube.com/watch?v=VpmA_Bb3CH8" target="_blank" rel="noopener">Learn Stepwise, Bitwig&#x27;s Step Sequencing Device</a> <span class="dur">3:04</span></li><li><label class="seen"><input type="checkbox" data-key="v-B2wRvrmM3L8"><span class="vh">Bekeken</span></label><span class="src src-b">Bitwig</span> <a href="https://www.youtube.com/watch?v=B2wRvrmM3L8" target="_blank" rel="noopener">Quick Tip: Randomized Percussion Sounds</a> <span class="dur">1:12</span></li></ul><p class="tm-sub">Routing (oud)</p><ul class="tm-l"><li><label class="seen"><input type="checkbox" data-key="v-eSSHcF6qFNQ"><span class="vh">Bekeken</span></label><span class="src src-x">XNB</span> <a href="https://www.youtube.com/watch?v=eSSHcF6qFNQ" target="_blank" rel="noopener">Note Receiver and Audio Receiver</a> <span class="dur">9:38</span></li></ul></details><details class="tm"><summary>Lezen <span>1</span></summary><ul class="tm-l"><li><a href="../MANUAL_PLUS/Ch19_Device_Descriptions.html#cat-note-fx">Hfst. 19 · Note Fx</a></li></ul></details><details class="tm"><summary>Eigen notities <span>1</span></summary><ul class="tm-l"><li><a href="file:///Users/danybuts/Dropbox/MARKDOWN%20NOTITIES/Muziek/DAWs/Bitwig/Bitwig%20MIDI%20Devices/Arpeggiator.md">Arpeggiator.md</a></li></ul></details></div></nav>
+<main>
+<h1>19a.1. Note FX · Toonhoogte en toonsoort</h1>
+<section id="intro" class="page"><h2>Inleiding <a class="man" href="../MANUAL_PLUS/Ch19_Device_Descriptions.html#cat-note-fx">handleiding §</a></h2><p><strong>Note FX</strong> bewerken <strong>noten</strong> voor ze bij het instrument komen. Audio gaat er ongewijzigd door. Je zet ze in de keten <strong>vóór</strong> het instrument (of in het Note FX-slot van een instrument, of in een Note FX Layer).</p><p>Dit deel gaat over <strong>toonhoogte</strong>:</p><table class="keys"><tr><th>Device</th><th>Kort</th></tr><tr><td><strong>Note Transpose</strong></td><td>alles een vast aantal octaven, halve tonen of fracties verschuiven</td></tr><tr><td><strong>Key Filter+</strong></td><td>noten aan een toonladder binden: weglaten of corrigeren, en verschuiven in toontrappen</td></tr><tr><td><strong>Transpose Map</strong></td><td>elke toonklasse apart omleggen (elke D wordt F#)</td></tr><tr><td><strong>Harmonize</strong></td><td>noten aanpassen aan de noten van een <strong>andere track</strong></td></tr><tr><td><strong>Micro-pitch</strong></td><td>microtonale stemmingen: elke toonklasse eigen stemming</td></tr><tr><td><strong>Bend</strong></td><td>elke noot laten aanglijden vanaf een andere toonhoogte</td></tr></table><aside class="bw6"><strong>Bitwig 6</strong> Het project heeft een <strong>globale toonsoort</strong> (root en scale). Note FX met <strong>Use Global Key</strong> kunnen die volgen, zodat je de toonsoort op één plek verandert. Veel Note FX hebben nu ook <strong>remote controls</strong>, zodat je ze met een controller bedient.</aside><p><em>▶ opent de clipspeler, die stopt aan het einde van de clip; aanvullende clips zijn grijs. Blauw kader = nieuw of anders in Bitwig 6, geel kader = nog na te kijken. XNB werkt op Windows: zijn Ctrl is jouw Cmd.</em></p></section><section id="transpose" class="page"><h2>Note Transpose <a class="man" href="../MANUAL_PLUS/Ch19_Device_Descriptions.html#d-note-transpose">handleiding §</a></h2><p>Verschuift alle inkomende noten met <strong>Octaves</strong> en <strong>Semitones</strong>. <strong>Fine</strong> verschuift met fracties van een halve toon (micro-pitch), voor een lichte ontstemming.</p><p>Toepassingen:</p><ul class="def"><li>een bas of lead een octaaf hoger of lager, zonder de noten te bewerken;</li><li>de transpositie <strong>moduleren</strong> met een LFO of Steps: een melodie die meebeweegt;</li><li>in een <strong>Instrument Layer</strong>: per laag een eigen Note Transpose (bv. +12 op de tweede laag), en één macro die ze allemaal stuurt, zoals de range-knop van een analoge synth.</li></ul><details class="f1"><summary>Bitwig-help (F1) <span>4 items · Bitwig 6.1.7</span></summary><p class="f1-d">Note transposer</p><dl><dt>Octave</dt><dd><p>Pitch shift amount in octaves (12 semitones each)</p></dd><dt>Semitone</dt><dd><p>Pitch shift amount in semitones (often &quot;st&quot;, or musical half steps)</p></dd><dt>Steps</dt><dd><p>Pitch shift in steps of the current global key</p></dd><dt>Fine</dt><dd><p>Pitch shift amount in as a percentage of one semitone</p><p>Some example settings:</p><ul><li>&#x27;0.00 %&#x27; represents no shift</li><li>&#x27;+50.0 %&#x27; represents 50 cents up</li><li>&#x27;-66.7 %&#x27; represents two-thirds of the way down toward the semitone below</li></ul></dd></dl><p class="f1-src">Letterlijk uit de interactieve help van Bitwig Studio (Engels). Lijsten met keuzes staan alleen in Bitwig zelf; namen zonder eigen titel zijn afgeleid van de interne sleutel.</p></details><ul class="clips"><li class=""><label class="seen"><input type="checkbox" data-key="c-a1MzBKd_44U-40"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=a1MzBKd_44U%3A40%3A140%3ABasis++octaven%2C+halve+tonen+en+fine&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Basis: octaven, halve tonen en fine</a><span class="by"><span class="src src-x">XNB</span> A guide to Bitwig Note Transpose · 0:40–2:20 · 1:40</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-a1MzBKd_44U-140"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=a1MzBKd_44U%3A140%3A265%3AModuleren+met+automation%2C+Steps+of+een+LFO&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Moduleren met automation, Steps of een LFO</a><span class="by"><span class="src src-x">XNB</span> A guide to Bitwig Note Transpose · 2:20–4:25 · 2:05</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-a1MzBKd_44U-265"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=a1MzBKd_44U%3A265%3A400%3AE%C3%A9n+macro+stuurt+Note+Transpose+in+elke+laag+van+een+Instrument+Layer+%28zoals+de+range-knop+van+een+Model+D%29&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Eén macro stuurt Note Transpose in elke laag van een Instrument Layer (zoals de range-knop van een Model D)</a><span class="by"><span class="src src-x">XNB</span> A guide to Bitwig Note Transpose · 4:25–6:40 · 2:15</span></li></ul></section><section id="keyfilter" class="page"><h2>Key Filter+ <a class="man" href="../MANUAL_PLUS/Ch19_Device_Descriptions.html#d-key-filter">handleiding §</a></h2><p>Bindt noten aan een <strong>toonladder</strong>: grondtoon (<em>Key</em>) en <strong>modus</strong> (majeur, mineur, dorisch …). Noten die niet passen worden:</p><ul class="def"><li><strong>Filter</strong>: weggelaten;</li><li><strong>Constrain</strong>: naar de dichtstbijzijnde noot in de toonladder geschoven.</li></ul><p>Daarnaast kun je noten <strong>verschuiven in toontrappen</strong> (<em>scale-degree shifts</em>): een stap hoger in de toonladder blijft in de toonladder. Een mineur-melodie kun je zo in een andere modus laten klinken.</p><aside class="bw6"><strong>Bitwig 6</strong> Het device heet nu <strong>Key Filter+</strong> en kan de <strong>globale toonsoort</strong> van het project volgen in plaats van een eigen toonladder. Het oude <strong>Key Filter</strong> bestaat nog als <em>legacy device</em> (in XNB's video heet het nog <em>Diatonic Transposer</em>).</aside><p>Toepassingen: als leerhulp bij live spelen (je kunt "niet fout" spelen); samen met <strong>Randomize</strong> of <strong>Multi-note</strong> om willekeurige of gestapelde noten in de toonladder te houden. Let op: Constrain op een snelle arpeggio kan dubbele noten geven.</p><details class="f1"><summary>Bitwig-help (F1) <span>5 items · Bitwig 6.1.7</span></summary><p class="f1-d">Conforms notes to a local scale or global key signature, with scale-degree shifts</p><dl><dt>Root</dt><dd><p>Root note of the scale/mode used:</p></dd><dt>Mode</dt><dd><p>Scale/mode being used:</p></dd><dt>Foreign</dt><dd><p>How out-of-key notes are treated:</p></dd><dt>Quantize</dt><dd><p>Quantize method for constraining pitch:</p></dd><dt>Key Signature [display]</dt><dd><p>Visualization of the currently used key signature</p></dd></dl><p class="f1-src">Letterlijk uit de interactieve help van Bitwig Studio (Engels). Lijsten met keuzes staan alleen in Bitwig zelf; namen zonder eigen titel zijn afgeleid van de interne sleutel.</p></details><ul class="clips"><li class=""><label class="seen"><input type="checkbox" data-key="c-zSNLgWrHw0A-0"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=zSNLgWrHw0A%3A0%3A49%3AWat+het+device+doet&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Wat het device doet</a><span class="by"><span class="src src-x">XNB</span> Diatonic Transposer / Key Filter · 0:00–0:49 · 0:49</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-zSNLgWrHw0A-59"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=zSNLgWrHw0A%3A59%3A158%3AModus+Filter++noten+buiten+de+toonladder+weglaten&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Modus Filter: noten buiten de toonladder weglaten</a><span class="by"><span class="src src-x">XNB</span> Diatonic Transposer / Key Filter · 0:59–2:38 · 1:39</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-zSNLgWrHw0A-158"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=zSNLgWrHw0A%3A158%3A268%3AVerschuiven+binnen+de+toonladder&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Verschuiven binnen de toonladder</a><span class="by"><span class="src src-x">XNB</span> Diatonic Transposer / Key Filter · 2:38–4:28 · 1:50</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-zSNLgWrHw0A-268"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=zSNLgWrHw0A%3A268%3A338%3AModus+Constrain++naar+de+volgende+noot+in+de+toonladder&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Modus Constrain: naar de volgende noot in de toonladder</a><span class="by"><span class="src src-x">XNB</span> Diatonic Transposer / Key Filter · 4:28–5:38 · 1:10</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-zSNLgWrHw0A-338"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=zSNLgWrHw0A%3A338%3A406%3AAls+leerhulp+bij+live+spelen%3B+let+op+met+arpeggio%27s&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Als leerhulp bij live spelen; let op met arpeggio's</a><span class="by"><span class="src src-x">XNB</span> Diatonic Transposer / Key Filter · 5:38–6:46 · 1:08</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-zSNLgWrHw0A-571"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=zSNLgWrHw0A%3A571%3A676%3AVariaties+maken+door+een+andere+toonladder+te+kiezen&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Variaties maken door een andere toonladder te kiezen</a><span class="by"><span class="src src-x">XNB</span> Diatonic Transposer / Key Filter · 9:31–11:16 · 1:45</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-zSNLgWrHw0A-406"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=zSNLgWrHw0A%3A406%3A571%3AToonsoort+van+een+clip+vinden+met+de+plugin+Scaler+%28geen+Bitwig-functie%29&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Toonsoort van een clip vinden met de plugin Scaler (geen Bitwig-functie)</a><span class="by"><span class="src src-x">XNB</span> Diatonic Transposer / Key Filter · 6:46–9:31 · 2:45</span></li></ul></section><section id="map" class="page"><h2>Transpose Map en Harmonize <a class="man" href="../MANUAL_PLUS/Ch19_Device_Descriptions.html#d-transpose-map">handleiding §</a></h2><p><strong>Transpose Map</strong> legt elke <strong>toonklasse</strong> apart om: voor elk van de twaalf noten kies je waar ze heen gaat (bv. elke D wordt F#). Noten kunnen eerst ook verschoven worden. Zo zet je een melodie om naar een andere toonladder of modus.</p><p><strong>Harmonize</strong> past inkomende noten aan op de <strong>noten die een andere track speelt</strong> (de <em>Harmony Source</em>): een melodie volgt dan automatisch de akkoorden van je pad. Stel een <strong>Pattern Key</strong> in, dan werkt de logica beter.</p><p>Over deze twee zijn er geen video's in de reeks.</p><details class="f1"><summary>Bitwig-help (F1) <span>4 items · Bitwig 6.1.7</span></summary><p class="f1-d">Remaps each note type (C, D, etc.)</p><dl><dt>Key</dt><dd><p>Root of the pitch class transform</p></dd><dt>Shift</dt><dd><p>Semitone offset to incoming notes before the pitch class transform</p></dd><dt>Octave</dt><dd><p>How each note&#x27;s octave is chosen:</p></dd><dt>Transform Grid [matrix]</dt><dd><p>This 12x12 grid represents incoming pitch classes (from left to right) and the outgoing pitch class they are mapped to (up and down). Clicking in any vertical column will select the pitch class output for that incoming note.</p></dd></dl><p class="f1-src">Letterlijk uit de interactieve help van Bitwig Studio (Engels). Lijsten met keuzes staan alleen in Bitwig zelf; namen zonder eigen titel zijn afgeleid van de interne sleutel.</p></details><details class="f1"><summary>Bitwig-help (F1) <span>2 items · Bitwig 6.1.7</span></summary><p class="f1-d">Harmonizes incoming notes based on another track</p><dl><dt>Harmony Source</dt><dd><p>Path for incoming note signal</p><p>All active notes from this source are analyzed for rough key structure, which notes arriving at this device are then conformed to fit.</p></dd><dt>Incoming key</dt><dd><p>Set this parameter to match the key of incoming notes, which helps improve the harmonic reshaping</p></dd></dl><p class="f1-src">Letterlijk uit de interactieve help van Bitwig Studio (Engels). Lijsten met keuzes staan alleen in Bitwig zelf; namen zonder eigen titel zijn afgeleid van de interne sleutel.</p></details></section><section id="micropitch" class="page"><h2>Micro-pitch <a class="man" href="../MANUAL_PLUS/Ch19_Device_Descriptions.html#d-micro-pitch">handleiding §</a></h2><p>Microtonale en macrotonale <strong>stemming</strong>: je bepaalt een <strong>grondtoon</strong> (die zuiver blijft) en de afwijking van elke andere toonklasse, plus het octaaf. <strong>Amount</strong> schuift alles terug richting de gewone gelijkzwevende stemming; de referentie rond <strong>A3</strong> (standaard 440 Hz) is instelbaar.</p><p>Bitwig levert <strong>presets</strong> met historische stemmingen (rein, otonaal, utonaal), stemmingen uit andere culturen (zevennotige toonladders op de witte toetsen) en experimentele herschikkingen van het klavier. Je kunt ook toonladderbestanden importeren.</p><aside class="bw6"><strong>Bitwig 6</strong> Micro-pitch heeft een <strong>12-noten</strong>-modus en een <strong>EDO</strong>-modus (een octaaf in een vrij aantal gelijke stappen).</aside><p>Werkt alleen met instrumenten die <strong>micro-pitch-expressies</strong> begrijpen: de Bitwig-instrumenten wel, niet elke plug-in.</p><details class="f1"><summary>Bitwig-help (F1) <span>13 items · Bitwig 6.1.7</span></summary><p class="f1-d">Micro-/macro-tuning, with 12-note and EDO modes</p><dl><dt>Mode</dt><dd><p>Method for retuning incoming notes:</p></dd><dt>Root</dt><dd><p>Note where the temperament starts and no pitch shift is applied</p></dd><dt>Octave</dt><dd><p>In 12 Note mode, the semitone shift applied at the note one octave above Root Key.</p><p>In EDO mode, the interval that is cut into the number of Divisions.</p></dd><dt>Octave 12</dt><dd><p>[12 Note mode] Semitone shift of the note one octave above Root Key</p></dd><dt>Octave edo</dt><dd><p>[EDO mode] Interval cut into the number of Divisions</p></dd><dt>Notes 1 thru 11 [0.00 to +24.00 st]</dt><dd><p>Semitone shift applied for each of the middle eleven notes</p><p>Note: Shifts can also be entered as fractions. For example, typing &#x27;3/2&#x27; would set that value to &#x27;7.02 st&#x27;.</p></dd><dt>A3</dt><dd><p>Frequency offset applied to the entire note range, set as the tuning for A3 (traditionally &#x27;440 Hz&#x27;)</p></dd><dt>Amount</dt><dd><p>A dry/wet blend between standard equal temperament (&#x27;0 %&#x27;) and full application of the set values (&#x27;100 %&#x27;)</p></dd><dt>Scale Visualization [display]</dt><dd><p>Shows all notes relatively, with the Root Key and Octave aligning at the top (12 o&#x27;clock).</p><p>Notes at traditional equal-tempered positions are shown with thin lines, which become thicker the further its tuning diverges.</p></dd><dt>Edo divisions</dt><dd><p>Number of pieces that the Interval is evenly divided into</p></dd><dt>EDO Visualization [display]</dt><dd><p>Shows the equally spread notes in one continuous pie. A helpful indicator of which relative degrees are currently triggered. (Note that a maximum of 24 divisions will be displayed, and the Amount parameter is not visualized.)</p></dd><dt>Past the Point of Visualization</dt><dd><p>Beyond 24 divisions, we can&#x27;t show you anything. Travel well.</p></dd><dt>Note: Scala File Support</dt><dd><p>Scala (SCL) files that describe either seven- or 12-note scales can be imported by dragging them onto the Micro-pitch device.</p><p>If the scale uses 12 notes, its values will be directly applied to all notes. Seven-note scales will import their values to the right column (the white notes from a C root) and use interpolated values for the other five notes.</p></dd></dl><p class="f1-src">Letterlijk uit de interactieve help van Bitwig Studio (Engels). Lijsten met keuzes staan alleen in Bitwig zelf; namen zonder eigen titel zijn afgeleid van de interne sleutel.</p></details><ul class="clips"><li class=""><label class="seen"><input type="checkbox" data-key="c-iSW08E1XaI8-0"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=iSW08E1XaI8%3A0%3A434%3AKennismaking++noten+hertunen%2C+toonladders+importeren%2C+modulatie&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Kennismaking: noten hertunen, toonladders importeren, modulatie</a><span class="by"><span class="src src-b">Bitwig</span> Micro-pitch device · 0:00–7:14 · 7:14</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-_Sm573jmEQs-48"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=_Sm573jmEQs%3A48%3A194%3APresets++historische+stemmingen+en+theorie+%28rein%2C+otonaal%2C+utonaal%29&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Presets: historische stemmingen en theorie (rein, otonaal, utonaal)</a><span class="by"><span class="src src-b">Bitwig</span> On Microtuning · 0:48–3:14 · 2:26</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-_Sm573jmEQs-194"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=_Sm573jmEQs%3A194%3A311%3ACulturele+toonladders%3B+7-toons+presets+liggen+op+de+witte+toetsen&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Culturele toonladders; 7-toons presets liggen op de witte toetsen</a><span class="by"><span class="src src-b">Bitwig</span> On Microtuning · 3:14–5:11 · 1:57</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-_Sm573jmEQs-311"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=_Sm573jmEQs%3A311%3A500%3AArtistieke+en+performance-presets+die+het+klavier+herschikken&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Artistieke en performance-presets die het klavier herschikken</a><span class="by"><span class="src src-b">Bitwig</span> On Microtuning · 5:11–8:20 · 3:09</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-_Sm573jmEQs-500"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=_Sm573jmEQs%3A500%3A710%3AWilson-hexany++zes+tonen+die+altijd+samengaan&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Wilson-hexany: zes tonen die altijd samengaan</a><span class="by"><span class="src src-b">Bitwig</span> On Microtuning · 8:20–11:50 · 3:30</span></li></ul></section><section id="bend" class="page"><h2>Bend <a class="man" href="../MANUAL_PLUS/Ch19_Device_Descriptions.html#d-bend">handleiding §</a></h2><p>Laat elke noot <strong>aanglijden</strong>: Bend maakt een micro-pitch-expressie die start op een andere toonhoogte (<strong>Starting Pitch</strong>, relatief, tot ±48 halve tonen) en naar de gespeelde noot glijdt.</p><ul class="def"><li><strong>Bend Shape</strong>: de kromming van de glijbeweging.</li><li><strong>Duur</strong>: in ms of in 16de noten.</li><li><strong>Pre-delay</strong> (XNB: <em>Offset</em>): de bend pas na een tijdje laten beginnen.</li></ul><p>Toepassingen: glissando op elk instrument; een snelle pitch-envelope voor punch; de hoeveelheid laten afhangen van de velocity; één keer vóór een Instrument Layer, zodat alle lagen dezelfde bend krijgen; een andere vorm van <em>glide</em> (vanaf de nieuwe noot in plaats van vanaf de vorige).</p><p>Neem je op, dan wordt de bend een gewone, bewerkbare micro-pitch-expressie in de clip. Werkt alleen met instrumenten die micro-pitch ondersteunen.</p><details class="f1"><summary>Bitwig-help (F1) <span>11 items · Bitwig 6.1.7</span></summary><dl><dt>Pitch</dt><dd><p>Offset pitch that each note begins from, before bending to its defined pitch</p></dd><dt>Curve</dt><dd><p>Slope for the pitch bend</p></dd><dt>Mode</dt><dd><p>When enabled, sets bend time in 16ᵗʰ notes</p></dd><dt>Time</dt><dd><p>Time-based bend time, used when the Set in 16ᵗʰ Notes mode switch is off</p></dd><dt>Beats</dt><dd><p>Number of 16ᵗʰ notes used for bend time</p></dd><dt>Beat offset</dt><dd><p>Scales the bend time to be slightly longer (positive values) or shorter (negative ones)</p></dd><dt>Delay enable</dt><dd><p>Delays the start of the pitch bend</p></dd><dt>Delay mode</dt><dd><p>When enabled, sets the bend delay in 16ᵗʰ notes</p></dd><dt>Delay time</dt><dd><p>Time-based bend delay length, used when the Set Delay in 16ᵗʰ Notes mode switch is off</p></dd><dt>Delay beats</dt><dd><p>Number of 16ᵗʰ notes used for bend delay</p></dd><dt>Delay beat offset</dt><dd><p>When using 16ᵗʰ notes, scales the bend delay to be slightly longer (positive values) or shorter (negative ones)</p></dd></dl><p class="f1-src">Letterlijk uit de interactieve help van Bitwig Studio (Engels). Lijsten met keuzes staan alleen in Bitwig zelf; namen zonder eigen titel zijn afgeleid van de interne sleutel.</p></details><ul class="clips"><li class=""><label class="seen"><input type="checkbox" data-key="c-2oP92pTmmOM-350"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=2oP92pTmmOM%3A350%3A380%3AKennismaking+%28tijden+bij+benadering%29&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Kennismaking (tijden bij benadering)</a><span class="by"><span class="src src-b">Bitwig</span> New Note FX in Bitwig Studio 4.1 · 5:50–6:20 · 0:30</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-N1TInqvU228-0"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=N1TInqvU228%3A0%3A74%3ABasis++een+bend+bij+elke+nieuwe+noot&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Basis: een bend bij elke nieuwe noot</a><span class="by"><span class="src src-x">XNB</span> Bend · 0:00–1:14 · 1:14</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-N1TInqvU228-74"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=N1TInqvU228%3A74%3A168%3AHoeveelheid+%28tot+%C2%B148+halve+tonen%29+en+curve&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Hoeveelheid (tot ±48 halve tonen) en curve</a><span class="by"><span class="src src-x">XNB</span> Bend · 1:14–2:48 · 1:34</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-N1TInqvU228-168"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=N1TInqvU228%3A168%3A226%3ADuur+in+ms+of+16e+noten&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Duur in ms of 16e noten</a><span class="by"><span class="src src-x">XNB</span> Bend · 2:48–3:46 · 0:58</span></li><li class=""><label class="seen"><input type="checkbox" data-key="c-N1TInqvU228-284"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=N1TInqvU228%3A284%3A363%3AOffset+%28in+de+handleiding++Pre-delay%29&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Offset (in de handleiding: Pre-delay)</a><span class="by"><span class="src src-x">XNB</span> Bend · 4:44–6:03 · 1:19</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-N1TInqvU228-226"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=N1TInqvU228%3A226%3A284%3AOpnemen++de+bend+wordt+een+bewerkbare+micro-pitch-expressie&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Opnemen: de bend wordt een bewerkbare micro-pitch-expressie</a><span class="by"><span class="src src-x">XNB</span> Bend · 3:46–4:44 · 0:58</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-N1TInqvU228-363"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=N1TInqvU228%3A363%3A442%3AModuleren+met+Beat+LFO&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Moduleren met Beat LFO</a><span class="by"><span class="src src-x">XNB</span> Bend · 6:03–7:22 · 1:19</span></li><li class="extra"><label class="seen"><input type="checkbox" data-key="c-N1TInqvU228-442"><span class="vh">Bekeken</span></label><a href="https://danybu.github.io/clipspeler/?c=N1TInqvU228%3A442%3A517%3AWerkt+alleen+met+instrumenten+die+micro-pitch+ondersteunen+%28Bitwig-instrumenten+wel%2C+niet+elke+plugin%29&amp;t=Hoofdstuk+19a.1+%C2%B7+Note+FX+%C2%B7+Toonhoogte+en+toonsoort" target="_blank" rel="noopener"><span class="play">▶</span> Werkt alleen met instrumenten die micro-pitch ondersteunen (Bitwig-instrumenten wel, niet elke plugin)</a><span class="by"><span class="src src-x">XNB</span> Bend · 7:22–8:37 · 1:15</span></li></ul></section>
+<div class="pager" id="pager"><a class="btn back" id="prev" href="#">‹ Terug</a>
+<div class="fwd"><a class="btn ghost" id="skip" href="#">Verder (niet klaar)</a><a class="btn primary" id="next" href="#">Verder ›</a></div></div>
+<p class="pstate" id="pstate"></p>
+</main>
+<aside class="keys-side" aria-label="Sneltoetsen naast de tekst"><div class="sk" data-p="intro"><ul></ul></div><div class="sk" data-p="transpose"><ul></ul></div><div class="sk" data-p="keyfilter"><ul></ul></div><div class="sk" data-p="map"><ul></ul></div><div class="sk" data-p="micropitch"><ul></ul></div><div class="sk" data-p="bend"><ul></ul></div></aside>
+</div><script>window.QUIZ={"items": {}, "pages": {"intro": [], "transpose": [], "keyfilter": [], "map": [], "micropitch": [], "bend": []}, "chapter": []};
+window.QUIZ_CAT={"o": "data:image/jpeg;base64,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", "z": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQABLAEsAAD/4QDGRXhpZgAATU0AKgAAAAgABQEOAAIAAAAsAAAASgEaAAUAAAABAAAAdgEbAAUAAAABAAAAfgE7AAIAAAANAAAAhodpAAQAAAABAAAAlAAAAABWZWN0b3IgaWxsdXN0cmF0aW9uIG9mIGN1dGUgaGFwcHkgYmxhY2sgY2F0AAAAASwAAAABAAABLAAAAAFZdWxpYSBNZWxueWsAAAADoAEAAwAAAAEAAQAAoAIABAAAAAEAAAFooAMABAAAAAEAAAFoAAAAAP/hCphodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDYuMC4wIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iIHBob3Rvc2hvcDpDcmVkaXQ9IkdldHR5IEltYWdlcy9pU3RvY2twaG90byI+IDxkYzpjcmVhdG9yPiA8cmRmOlNlcT4gPHJkZjpsaT5ZdWxpYSBNZWxueWs8L3JkZjpsaT4gPC9yZGY6U2VxPiA8L2RjOmNyZWF0b3I+IDxkYzpkZXNjcmlwdGlvbj4gPHJkZjpBbHQ+IDxyZGY6bGkgeG1sOmxhbmc9IngtZGVmYXVsdCI+VmVjdG9yIGlsbHVzdHJhdGlvbiBvZiBjdXRlIGhhcHB5IGJsYWNrIGNhdDwvcmRmOmxpPiA8L3JkZjpBbHQ+IDwvZGM6ZGVzY3JpcHRpb24+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDw/eHBhY2tldCBlbmQ9InciPz4A/+0AplBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAABtHAFaAAMbJUccAgAAAgACHAJuABhHZXR0eSBJbWFnZXMvaVN0b2NrcGhvdG8cAngAK1ZlY3RvciBpbGx1c3RyYXRpb24gb2YgY3V0ZSBoYXBweSBibGFjayBjYXQcAlAADFl1bGlhIE1lbG55awA4QklNBCUAAAAAABCSdISgXcKlwXl97r4XvJYN/8IAEQgBaAFoAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAMCBAEFAAYHCAkKC//EAMMQAAEDAwIEAwQGBAcGBAgGcwECAAMRBBIhBTETIhAGQVEyFGFxIweBIJFCFaFSM7EkYjAWwXLRQ5I0ggjhU0AlYxc18JNzolBEsoPxJlQ2ZJR0wmDShKMYcOInRTdls1V1pJXDhfLTRnaA40dWZrQJChkaKCkqODk6SElKV1hZWmdoaWp3eHl6hoeIiYqQlpeYmZqgpaanqKmqsLW2t7i5usDExcbHyMnK0NTV1tfY2drg5OXm5+jp6vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAQIAAwQFBgcICQoL/8QAwxEAAgIBAwMDAgMFAgUCBASHAQACEQMQEiEEIDFBEwUwIjJRFEAGMyNhQhVxUjSBUCSRoUOxFgdiNVPw0SVgwUThcvEXgmM2cCZFVJInotIICQoYGRooKSo3ODk6RkdISUpVVldYWVpkZWZnaGlqc3R1dnd4eXqAg4SFhoeIiYqQk5SVlpeYmZqgo6SlpqeoqaqwsrO0tba3uLm6wMLDxMXGx8jJytDT1NXW19jZ2uDi4+Tl5ufo6ery8/T19vf4+fr/2wBDAAICAgICAgMCAgMFAwMDBQYFBQUFBggGBgYGBggKCAgICAgICgoKCgoKCgoMDAwMDAwODg4ODg8PDw8PDw8PDw//2wBDAQICAgQEBAcEBAcQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/2gAMAwEAAhEDEQAAAfv7bVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW28pr1beWep1ttW21bbVttW21bbVttW21bbVttW21bbVtXWFTtq22rbattq22rbattq23z7Svza4X6Qr0r9Bfy+/Qqu321bbVttW21bbVttW21bbVttW21bbVhk5Gvyj703kVfqH7D+Av01X6wbyn1attyVdbviP54r9V6/8cRV+0rr8WO/r9aN8F+61d/kFd8TXpnvfn/odb6R+bvVq+3NtW21bbVttW21bbVttW21bbVttW21bzL03z2vglk4PXzfxP1B82Un9JfzP6av0F+M2j2mjg2qJ2qEE1NmFxq8qr/YeHr37pOF7ild9wPqdfb+2rbattq22rbattq22rbattq22rbatX2EV+Wtz0HP1WeQ+zeZ14t6Q1vK2zim6rA1MCO9TXOtTND/VVIuBVXen+bir2L6b+OP1Iq221bbVttW21bbVttW21bbVttW21bbVttXzT8xfpZ+dVUPkZmtSRdjQjbVttW21bbVs06rIc8r6A5XjTykbGy9DSq/Rf8+7c3616vsK22rbattq22rbattq22rbattq22rbat8BffH461U2TW4pE9P9U+Xn868a29ArzB36R5p3OvbbHbDrrqVx81+fn1/6G/mH9o7t7T8a/XXg/mZ8SMm9zb7O+svzK/TGiaJrbattq22rbattq22rbattq22rbavLfyh/Rz86KtXjR1X2/wDnL+pv5E+Biy908MP7+33h475H9A8icBtut8lWrqvmT6r8o4k8ndv/AG7ob6M8g9x+RfLzppEL2dfZv0A8S9mq66blOxo22rbattq22rbattq22rbattq1Y1Y18zfA37Zfk1Xn17zy6+0/L/LPbPIy+PFfanN9Lc3xjmv6CXzjt6bZmvZ8kSup6jkDqPY6fzTc4lEV3U1J9Bd7921S3nnziu5Yv9W21bbVttW21bbVttW21aJ8XrrHf5PWFfsDxlxZV5q59L82r87vIv1k8Vr4pfFp6uNWGp7m66rXLvVpSij5mCrFqw+iq8F+4/dO0qJ2rN3GoB9q22rbattq22rbattq22rfBX3r8E180I0V+xDlq6rnCXJq0Tqr/m36i1flf5R7r4JT4tSOrvUiqtm7RxQ21mav0a+gfjL7Nrbattq22rbattq22rbattq22rbattq3yX9acFX5RPaLpa/UH0T5J+tq22rbat5b6l+c9fMziX9CLK6Rnp6rF2mqqRcAr1j9Lvx9/YKp21bbVttW21bbVttW21bbVttW21bbVonV+YHlf6dfljXqP6o/jz9l19gaJrbaqD8d/v8A/Pyn5Mqi2Gmtm7ittq22rnf2E/IT9Tq9L21bbVttW21bbVttW21bbVttW21bbVttUfFf2qmvxeuPo/5Zr9HvoP8AHH61r7azB9X51fN/qXl1PBPndNX1C+pNnTXFSEtBVw4o7yqr9MvzM/TCvZttW21bbVttW21bbVttW21bbVttW21bbVttUfIv13q/GE/6vfEleMfRHyaSr3nWh6u39Ta1HPdJzlFuKazo9LcU9I6Hm+kqk/Un8rv19rpttW21bbVttW21bbVttW21bbVttW21bbVttW21aJ1c384/WWr8xvCP2s/L6vI7TnX1XfOkb1ct3dTXS83d0dFvaR7T39g/zz/Q6ttq22rbattq22rbattq22rbattq22rbattq22rbattqzR3q+QvnP9SdX44Un7Uir8Ul/s8GvxnD+zIK/HL2X9PX9cd2O1bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21bbVttW21f/2gAIAQEAAQUC/wCntPFHjDafClt4W8V2nim0/wB9Xjjx3Z+E7a19+8Sb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"};
+
+/* Voortgang delen tussen al je browsers (Mac, iPhone, Readdle Documents …).
+   De pagina's werken met localStorage; dit script spiegelt de voortgangssleutels naar voortgang.json
+   in je privé-repo danybu/bitwig-voortgang (GitHub). Per toestel vul je één keer een GitHub-token in.
+   Het nieuwste wint: bij openen en bij terugkeren naar de pagina wordt opgehaald, na elke wijziging bewaard. */
+(function(){
+  var KEYS=/^(bitwig-leerpad-gezien|leerpad-afgewerkt-|bw-quiz-v1|sc-view|leerpad-alles)/, STAMP='leerpad-sync-stamp',
+      TOK='leerpad-gh-token', REPO='danybu/bitwig-voortgang', PATH='voortgang.json',
+      API='https://api.github.com/repos/'+REPO+'/contents/'+PATH;
+  function ls(){try{return window.localStorage}catch(e){return null}}
+  var L=ls(); if(!L)return;
+  var timer=null, state='', lastSaved=null, sha=null, busy=false, again=false, form=false;
+  function token(){return L.getItem(TOK)||''}
+  function snapshot(){var d={};for(var i=0;i<L.length;i++){var k=L.key(i);if(KEYS.test(k))d[k]=L.getItem(k)}return d}
+  function stamp(){return +(L.getItem(STAMP)||0)}
+  var orig=Storage.prototype.setItem, origRm=Storage.prototype.removeItem;
+  function touched(k){if(KEYS.test(k)){orig.call(L,STAMP,String(Date.now()));schedule()}}
+  Storage.prototype.setItem=function(k,v){orig.call(this,k,v);if(this===L)touched(k)};
+  Storage.prototype.removeItem=function(k){origRm.call(this,k);if(this===L)touched(k)};
+  function b64e(s){return btoa(unescape(encodeURIComponent(s)))}
+  function b64d(s){return decodeURIComponent(escape(atob(s.replace(/\n/g,''))))}
+  function hdr(){return {'Authorization':'Bearer '+token(),'Accept':'application/vnd.github+json'}}
+  function fetchRemote(){
+    return fetch(API+'?t='+Date.now(),{headers:hdr(),cache:'no-store'}).then(function(r){
+      if(r.status===404)return {sha:null,data:null};
+      if(r.status===401||r.status===403)throw 'token';
+      if(!r.ok)throw 'net';
+      return r.json().then(function(j){var d=null;try{d=JSON.parse(b64d(j.content))}catch(e){}return {sha:j.sha,data:d}});
+    });
+  }
+  function adopt(d){
+    Object.keys(snapshot()).forEach(function(k){if(!(k in d.sleutels))origRm.call(L,k)});
+    Object.keys(d.sleutels).forEach(function(k){orig.call(L,k,d.sleutels[k])});
+    orig.call(L,STAMP,String(d.bewaard));
+  }
+  function pull(reloadOk){
+    if(!token())return Promise.resolve();
+    return fetchRemote().then(function(r){
+      sha=r.sha;
+      if(r.data&&r.data.sleutels&&(r.data.bewaard||0)>stamp()){
+        adopt(r.data);lastSaved=new Date(r.data.bewaard);state='ok';ui();
+        if(reloadOk&&!sessionStorage.getItem('leerpad-herladen')){sessionStorage.setItem('leerpad-herladen','1');location.reload();return}
+      }else if(!r.data||(r.data.bewaard||0)<stamp()){return push()}
+      else{lastSaved=new Date(r.data.bewaard);state='ok';ui()}
+      sessionStorage.removeItem('leerpad-herladen');
+    }).catch(function(e){state=e==='token'?'token':'fout';ui()});
+  }
+  function push(){
+    if(!token())return Promise.resolve();
+    if(busy){again=true;return Promise.resolve()}
+    busy=true;
+    var data={versie:2,bewaard:stamp()||Date.now(),sleutels:snapshot()};
+    function put(){
+      var body={message:'voortgang',content:b64e(JSON.stringify(data,null,1))};if(sha)body.sha=sha;
+      return fetch(API,{method:'PUT',headers:hdr(),body:JSON.stringify(body)}).then(function(r){
+        if(r.status===409||r.status===422)return 'stale';
+        if(r.status===401||r.status===403)throw 'token';
+        if(!r.ok)throw 'net';
+        return r.json().then(function(j){sha=j.content.sha;return 'ok'});
+      });
+    }
+    return put().then(function(res){
+      if(res!=='stale')return res;
+      // intussen elders bewaard: is dat nieuwer, dan overnemen; anders overschrijven
+      return fetchRemote().then(function(r){sha=r.sha;
+        if(r.data&&(r.data.bewaard||0)>data.bewaard){adopt(r.data);return 'reload'}
+        return put()});
+    }).then(function(res){
+      busy=false;if(res==='reload'){location.reload();return}
+      if(res==='stale'){state='fout';ui();return}
+      lastSaved=new Date();state='ok';ui();if(again){again=false;push()}
+    }).catch(function(e){busy=false;state=e==='token'?'token':'fout';ui()});
+  }
+  function schedule(){if(!token())return;clearTimeout(timer);timer=setTimeout(function(){timer=null;push()},1200)}
+  function exportFile(){var b=new Blob([JSON.stringify({versie:2,bewaard:stamp()||Date.now(),sleutels:snapshot()},null,1)],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='voortgang.json';document.body.appendChild(a);a.click();a.remove()}
+  function importFile(){var i=document.createElement('input');i.type='file';i.accept='.json,application/json';
+    i.onchange=function(){var f=i.files[0];if(!f)return;f.text().then(function(t){var d=JSON.parse(t);
+      Object.keys(d.sleutels||{}).forEach(function(k){orig.call(L,k,d.sleutels[k])});orig.call(L,STAMP,String(Date.now()));
+      push().then(function(){location.reload()})})};i.click()}
+  // ---- kleine balk
+  var box=document.createElement('div');box.className='vg';
+  function fmt(d){return d?d.toLocaleTimeString('nl-BE',{hour:'2-digit',minute:'2-digit'}):''}
+  function ui(){
+    var h='<span class="vg-t">Voortgang</span> ';
+    if(form){
+      h+='<span class="vg-s">Plak je GitHub-token:</span><br>'+
+         '<input type="password" class="vg-in" autocomplete="off" style="width:100%;max-width:260px;font:inherit;padding:3px 6px;margin:3px 0"> '+
+         '<button type="button" data-v="bewaar">Koppel</button> <a href="#" data-v="annuleer">annuleren</a>';
+    }else if(!token())h+='<span class="vg-s">alleen in deze browser</span> <button type="button" data-v="koppel" title="Deel de voortgang met je andere toestellen via GitHub">Koppel GitHub</button>';
+    else if(state==='ok')h+='<span class="vg-s ok">✓ gedeeld'+(lastSaved?' · '+fmt(lastSaved):'')+'</span>';
+    else if(state==='token')h+='<span class="vg-s bad">token geweigerd</span> <button type="button" data-v="koppel">Nieuw token</button>';
+    else if(state==='fout')h+='<span class="vg-s bad">kon niet synchroniseren</span> <button type="button" data-v="opnieuw">Opnieuw</button>';
+    else h+='<span class="vg-s">bezig …</span>';
+    if(!form)h+=' <span class="vg-x"><a href="#" data-v="export">exporteren</a> · <a href="#" data-v="import">importeren</a>'+(token()?' · <a href="#" data-v="ontkoppel">ontkoppelen</a>':'')+'</span>';
+    box.innerHTML=h;
+    if(form){var inp=box.querySelector('.vg-in');inp&&inp.focus()}
+  }
+  box.addEventListener('click',function(e){var b=e.target.closest('[data-v]');if(!b)return;e.preventDefault();
+    var v=b.dataset.v;
+    if(v==='koppel'){form=true;ui()}
+    else if(v==='annuleer'){form=false;ui()}
+    else if(v==='bewaar'){var t=(box.querySelector('.vg-in').value||'').trim();if(!t)return;orig.call(L,TOK,t);form=false;state='';ui();pull(true)}
+    else if(v==='ontkoppel'){origRm.call(L,TOK);state='';ui()}
+    else if(v==='opnieuw'){state='';ui();pull(true)}
+    else if(v==='export')exportFile();else if(v==='import')importFile()});
+  box.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.classList.contains('vg-in')){e.preventDefault();box.querySelector('[data-v="bewaar"]').click()}});
+  function mount(){var t=document.querySelector('.toc-links')||document.querySelector('.prog');if(t)t.parentNode.insertBefore(box,t.nextSibling);else document.body.appendChild(box);ui()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+  if(token())pull(true);
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible'&&token())pull(true);
+    else if(document.visibilityState==='hidden'&&timer){clearTimeout(timer);timer=null;push()}});
+})();
+(function(){
+  var KEY='bitwig-leerpad-gezien';
+  var seen={};
+  try{seen=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){seen={}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(seen))}catch(e){}}
+  var boxes=[].slice.call(document.querySelectorAll('input[data-key]'));
+  function update(){
+    var keys={},done={};
+    boxes.forEach(function(b){keys[b.dataset.key]=1;if(b.checked)done[b.dataset.key]=1;b.closest('li').classList.toggle('done',b.checked)});
+    var n=Object.keys(keys).length,d=Object.keys(done).length;
+    var p=document.getElementById('prog');if(p)p.textContent='Bekeken: '+d+' van '+n;
+  }
+  boxes.forEach(function(b){
+    b.checked=!!seen[b.dataset.key];
+    b.addEventListener('change',function(){
+      // dezelfde video kan op meerdere plaatsen staan: alle vakjes met dezelfde sleutel samen zetten
+      var k=b.dataset.key;if(b.checked)seen[k]=1;else delete seen[k];
+      boxes.forEach(function(o){if(o.dataset.key===k)o.checked=b.checked});
+      save();update();
+    });
+  });
+  update();
+})();
+
+(function(){
+  var ORDER=['Gereedschappen','Grid en snapping','Expressies','Bewerken','Selecteren en tijdselectie','Weergave en navigatie','Waarden','Overig'];
+  document.querySelectorAll('.sc-wrap').forEach(function(w){
+    var tb=w.querySelector('tbody'), rows=[].slice.call(tb.querySelectorAll('tr[data-g]'));
+    var only=w.querySelector('.sc-only'), grp=w.querySelector('.sc-grp');
+    try{var st=JSON.parse(localStorage.getItem('sc-view')||'{}');if(st.only)only.checked=true;if(st.grp)grp.value=st.grp}catch(e){}
+    function A(r){return r.dataset.a==='1'?'Toegekend':'Niet toegekend'}
+    function hdr(t,c){var tr=document.createElement('tr');tr.className=c;var th=document.createElement('th');th.colSpan=2;th.textContent=t;tr.appendChild(th);return tr}
+    function render(){
+      while(tb.firstChild)tb.removeChild(tb.firstChild);
+      var vis=rows.filter(function(r){return !only.checked||r.dataset.a==='1'});
+      var m=grp.value, k1=m==='ag'?A:function(r){return r.dataset.g}, k2=m==='ga'?A:(m==='ag'?function(r){return r.dataset.g}:null);
+      function o1(x){return m==='ag'?(x==='Toegekend'?0:1):ORDER.indexOf(x)}
+      var g1={};vis.forEach(function(r){(g1[k1(r)]=g1[k1(r)]||[]).push(r)});
+      Object.keys(g1).sort(function(a,b){return o1(a)-o1(b)}).forEach(function(a){
+        tb.appendChild(hdr(a+' ('+g1[a].length+')','sc-h1'));
+        if(!k2){g1[a].forEach(function(r){tb.appendChild(r)});return}
+        var g2={};g1[a].forEach(function(r){(g2[k2(r)]=g2[k2(r)]||[]).push(r)});
+        Object.keys(g2).sort(function(x,y){return m==='ga'?(x==='Toegekend'?-1:1):ORDER.indexOf(x)-ORDER.indexOf(y)}).forEach(function(b){
+          if(Object.keys(g2).length>1||m==='ag')tb.appendChild(hdr(b,'sc-h2'));g2[b].forEach(function(r){tb.appendChild(r)})});
+      });
+    }
+    function save(){try{localStorage.setItem('sc-view',JSON.stringify({only:only.checked,grp:grp.value}))}catch(e){}}
+    only.addEventListener('change',function(){save();render()});grp.addEventListener('change',function(){save();render()});
+    render();
+  });
+})();
+(function(){
+  var ch=document.body.dataset.chapter||'x', KEY='leerpad-afgewerkt-'+ch, done={};
+  try{done=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
+  var pages=[].slice.call(document.querySelectorAll('section.page')), ids=pages.map(function(s){return s.id});
+  var toc=[].slice.call(document.querySelectorAll('.toc li[data-p]')), sks=[].slice.call(document.querySelectorAll('.sk[data-p]'));
+  var all=document.getElementById('showall'), pager=document.getElementById('pager'), pstate=document.getElementById('pstate');
+  var prev=document.getElementById('prev'), next=document.getElementById('next'), skip=document.getElementById('skip'), cur=ids[0];
+  try{all.checked=localStorage.getItem('leerpad-alles')==='1'}catch(e){}
+  function pageOf(h){var el=h&&document.getElementById(h);if(!el)return ids[0];var s=el.closest('section.page');return s?s.id:ids[0]}
+  function marks(){
+    toc.forEach(function(li){var id=li.dataset.p;li.classList.toggle('done',!!done[id]);li.classList.toggle('cur',id===cur&&!all.checked)});
+    document.getElementById('donecount').textContent=ids.filter(function(i){return done[i]}).length+' van '+ids.length+' delen afgewerkt';
+    pstate.textContent=done[cur]?'✓ Dit deel staat als afgewerkt.':'';
+  }
+  function go(id){location.hash='#'+id}
+  function show(id,scroll){
+    cur=id; var i=ids.indexOf(id), last=i===ids.length-1;
+    pages.forEach(function(s){s.hidden=!all.checked&&s.id!==id});
+    sks.forEach(function(k){k.hidden=!all.checked&&k.dataset.p!==id});
+    document.body.classList.toggle('allmode',all.checked);
+    prev.style.visibility=i>0?'visible':'hidden';
+    skip.style.display=last?'none':'';
+    next.textContent=last?'Afgewerkt ✓':'Verder ›';
+    marks();
+    if(scroll){var h=location.hash.slice(1),el=h&&document.getElementById(h);
+      if(el&&el.id!==id)el.scrollIntoView();else window.scrollTo(0,all.checked?document.getElementById(id).offsetTop-10:0)}
+  }
+  prev.addEventListener('click',function(e){e.preventDefault();var i=ids.indexOf(cur);if(i>0)go(ids[i-1])});
+  skip.addEventListener('click',function(e){e.preventDefault();delete done[cur];save();var i=ids.indexOf(cur);if(i<ids.length-1)go(ids[i+1])});
+  next.addEventListener('click',function(e){e.preventDefault();done[cur]=1;save();var i=ids.indexOf(cur);if(i<ids.length-1)go(ids[i+1]);else marks()});
+  window.addEventListener('hashchange',function(){show(pageOf(location.hash.slice(1)),true)});
+  all.addEventListener('change',function(){try{localStorage.setItem('leerpad-alles',all.checked?'1':'0')}catch(e){};show(cur,true)});
+  show(pageOf(location.hash.slice(1)),true);
+})();
+(function(){
+  var ov=document.createElement('div');ov.className='lb';ov.hidden=true;
+  var img=document.createElement('img');img.alt='';var cap=document.createElement('p');cap.className='lb-cap';
+  var close=document.createElement('button');close.className='lb-x';close.type='button';close.setAttribute('aria-label','Sluiten');close.textContent='×';
+  ov.appendChild(img);ov.appendChild(cap);ov.appendChild(close);document.body.appendChild(ov);
+  var list=[],idx=0;
+  function open(a){
+    var sec=a.closest('section.page')||document;list=[].slice.call(sec.querySelectorAll('figure a'));idx=list.indexOf(a);show();
+    ov.hidden=false;document.documentElement.style.overflow='hidden';
+  }
+  function fit(){var w=img.naturalWidth||1,h=img.naturalHeight||1,W=window.innerWidth,H=window.innerHeight-44,k=Math.min(W/w,H/h);img.style.width=Math.floor(w*k)+'px';img.style.height=Math.floor(h*k)+'px'}
+  img.addEventListener('load',fit);window.addEventListener('resize',function(){if(!ov.hidden)fit()});
+  function show(){var a=list[idx];img.style.width=img.style.height='';img.src=a.querySelector('img').src;img.alt=a.querySelector('img').alt;
+    var fc=a.closest('figure').querySelector('figcaption');cap.textContent=(fc?fc.textContent:'')+(list.length>1?'  ('+(idx+1)+'/'+list.length+')':'')}
+  function shut(){ov.hidden=true;document.documentElement.style.overflow='';img.removeAttribute('src')}
+  document.addEventListener('click',function(e){var a=e.target.closest('figure a');if(a&&!e.metaKey&&!e.ctrlKey){e.preventDefault();open(a)}});
+  ov.addEventListener('click',function(e){if(e.target!==img)shut();else if(list.length>1){idx=(idx+1)%list.length;show()}});
+  document.addEventListener('keydown',function(e){if(ov.hidden)return;
+    if(e.key==='Escape')shut();
+    else if(e.key==='ArrowRight'&&list.length>1){idx=(idx+1)%list.length;show();e.preventDefault()}
+    else if(e.key==='ArrowLeft'&&list.length>1){idx=(idx-1+list.length)%list.length;show();e.preventDefault()}});
+})();
+
+/* Rechterkolom: elke sneltoets op de hoogte van de plek waar hij in de tekst staat. */
+(function(){
+  var side=document.querySelector('.keys-side'), main=document.querySelector('main');
+  if(!side||!main)return;
+  var queued=false;
+  function lay(){
+    queued=false;
+    if(getComputedStyle(side).display==='none')return;
+    var top0=side.getBoundingClientRect().top, y=0;
+    side.querySelectorAll('.sk').forEach(function(sk){
+      if(sk.hidden)return;
+      sk.querySelectorAll('li[data-a]').forEach(function(li){
+        var a=main.querySelector('[data-sk~="'+li.dataset.a+'"]');
+        if(!a||!a.offsetParent){li.style.display='none';return}
+        li.style.display='';
+        var t=Math.max(a.getBoundingClientRect().top-top0-3, y);
+        li.style.top=t+'px';
+        y=t+li.offsetHeight+6;
+      });
+    });
+  }
+  function q(){if(!queued){queued=true;requestAnimationFrame(lay)}}
+  window.addEventListener('resize',q);window.addEventListener('load',q);window.addEventListener('hashchange',q);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(q);
+  if(window.ResizeObserver)new ResizeObserver(q).observe(main);
+  new MutationObserver(q).observe(side,{attributes:true,subtree:true,attributeFilter:['hidden']});
+  main.addEventListener('load',q,true);
+  // aanwijzen in de kolom licht de plek in de tekst op, en omgekeerd
+  side.addEventListener('mouseover',function(e){var li=e.target.closest('li[data-a]');if(!li)return;var a=main.querySelector('[data-sk~="'+li.dataset.a+'"]');if(a)a.classList.add('sk-hl')});
+  side.addEventListener('mouseout',function(e){var li=e.target.closest('li[data-a]');if(!li)return;var a=main.querySelector('[data-sk~="'+li.dataset.a+'"]');if(a)a.classList.remove('sk-hl')});
+  main.addEventListener('mouseover',function(e){var a=e.target.closest('[data-sk]');if(!a)return;a.dataset.sk.split(' ').forEach(function(id){var li=side.querySelector('li[data-a="'+id+'"]');if(li)li.classList.add('on')})});
+  main.addEventListener('mouseout',function(e){var a=e.target.closest('[data-sk]');if(!a)return;a.dataset.sk.split(' ').forEach(function(id){var li=side.querySelector('li[data-a="'+id+'"]');if(li)li.classList.remove('on')})});
+  q();
+})();
+
+/* Oefenen van sneltoetsen, naar de BitwigShortcuts-app (QuizView + LearningEngine, SM-2).
+   Toetsen één voor één: elke modifier schakelt aan/uit, de gewone toets ook; ↩ controleert.
+   Voortgang per functie in localStorage (gedeeld over alle hoofdstukken). */
+(function(){
+  var D=window.QUIZ; if(!D||!D.chapter.length)return;
+  var LS='bw-quiz-v1', P={}, DAY=864e5;
+  try{P=JSON.parse(localStorage.getItem(LS)||'{}')||{}}catch(e){}
+  function save(){try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}}
+  function prog(n){return P[n]||(P[n]={ef:2.5,iv:0,rep:0,next:0,c:0,w:0,hint:''})}
+  function seen(n){var p=P[n];return !!p&&!!(p.first||p.rep||p.w)}
+  function isDue(n){var p=P[n];return !p||!p.next||p.next<=Date.now()}
+  function mastered(n){return !!P[n]&&P[n].iv>=21}
+  // SM-2 zoals ShortcutProgress.record(quality:)
+  function record(n,q){var p=prog(n),now=Date.now();if(!p.first)p.first=now;p.last=now;
+    if(q>=3){p.c++;p.iv=p.rep===0?0:p.rep===1?1:p.rep===2?6:Math.round(p.iv*p.ef);p.rep++}
+    else{p.w++;p.rep=0;p.iv=0}
+    p.ef=Math.max(1.3,p.ef+0.1-(5-q)*(0.08+(5-q)*0.02));
+    p.next=p.iv===0?now:now+p.iv*DAY;save()}
+
+  var LM=null;try{navigator.keyboard&&navigator.keyboard.getLayoutMap&&navigator.keyboard.getLayoutMap().then(function(m){LM=m}).catch(function(){})}catch(e){}
+  var MS={ctrl:'⌃',alt:'⌥',shift:'⇧',cmd:'⌘'},MT={ctrl:'Control',alt:'Option (Alt)',shift:'Shift',cmd:'Command'},MO=['ctrl','alt','shift','cmd'];
+  var MODKEY={Meta:'cmd',Shift:'shift',Alt:'alt',Control:'ctrl'};
+  var NAMED={Escape:'esc',' ':'space',Tab:'tab',Backspace:'backspace',Delete:'delete',Home:'home',End:'end',PageUp:'pageup',PageDown:'pagedown',Insert:'insert',ArrowLeft:'←',ArrowRight:'→',ArrowUp:'↑',ArrowDown:'↓'};
+  var SHOW={esc:'Esc',enter:'↩ Enter',space:'Spatie',tab:'Tab',backspace:'⌫',delete:'Del',home:'Home',end:'End',pageup:'PgUp',pagedown:'PgDn',insert:'Ins','num-enter':'Num Enter',numplus:'Num+',numminus:'Num−'};
+  function show(k){return SHOW[k]||(/^num\d$/.test(k)?'Num'+k.slice(3):k.toUpperCase())}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function cands(e){
+    var k=e.key,code=e.code||'',c=[];
+    if(/^Numpad\d$/.test(code))return['num'+code.slice(6)];
+    if(code==='NumpadAdd')return['numplus'];if(code==='NumpadSubtract')return['numminus'];
+    if(code==='NumpadEnter')return['num-enter'];if(code==='NumpadMultiply')return['*'];
+    if(NAMED[k])return[NAMED[k]];
+    if(/^F\d{1,2}$/.test(k))return[k.toLowerCase()];
+    var lm=LM&&LM.get(code);if(lm)c.push(lm.toLowerCase());
+    if(k&&k.length===1)c.push(k.toLowerCase());
+    if(/^Digit\d$/.test(code))c.push(code.slice(5));
+    return c.filter(function(x,i){return c.indexOf(x)===i});
+  }
+  function capsHTML(mods,keys,big){var cl='cap'+(big?' big':'');
+    return '<span class="combo">'+MO.filter(function(m){return mods.indexOf(m)>=0}).map(function(m){return '<kbd class="'+cl+' mod" title="'+MT[m]+'">'+MS[m]+'</kbd>'}).join('')
+      +(keys?'<kbd class="'+cl+'">'+esc(show(keys[0]))+'</kbd>':'')+'</span>'}
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+  var CAT=window.QUIZ_CAT||{o:'_bouw/img/kat_oranje.jpg',z:'_bouw/img/kat_zwart.jpg'};
+
+  var S=null; // lopende sessie
+  function scopeNames(sc){return sc==='*'?D.chapter:(D.pages[sc]||[])}
+  function buildQueue(names,all){
+    var due=[],nw=[],rest=[];
+    names.forEach(function(n){if(!seen(n))nw.push(n);else if(isDue(n))due.push(n);else rest.push(n)});
+    var bynext=function(a,b){return (P[a].next||0)-(P[b].next||0)};due.sort(bynext);rest.sort(bynext);
+    if(all)return shuffle(names);
+    // zoals de app: alles wat aan de beurt is + max. 7 nieuwe; aangevuld tot 12 met wat het eerst terugkomt
+    var q=due.concat(shuffle(nw).slice(0,7));
+    if(q.length<12)q=q.concat(rest.slice(0,12-q.length));
+    return shuffle(q.slice(0,30));
+  }
+  function start(box,sc,all){
+    if(S&&S.box!==box)stop();
+    var names=scopeNames(sc);
+    S={box:box,stage:box.querySelector('.qz-stage'),scope:sc,names:names,all:all,queue:buildQueue(names,all),
+       reviewed:{},score:0,streak:0,done:0,total:0,mods:[],key:null,state:'',cur:null,wrongRound:false,shake:false};
+    S.total=S.queue.length;
+    box.classList.add('on');S.stage.hidden=false;
+    next();S.stage.focus({preventScroll:true});
+    S.stage.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  function stop(){if(!S)return;S.stage.hidden=true;S.stage.innerHTML='';S.box.classList.remove('on');S=null;stats()}
+  function next(){
+    S.mods=[];S.key=null;S.wrongRound=false;
+    if(!S.queue.length){S.state='done';S.cur=null;render();stats();return}
+    S.cur=S.queue.shift();S.state=seen(S.cur)?'waiting':'intro';render();
+  }
+  function hint(n){return (P[n]&&P[n].hint)||D.items[n].u||''}
+  function saveHint(v){var p=prog(S.cur);v=v.trim();p.hint=(v===D.items[S.cur].u)?'':v;save()}
+  function matches(){var it=D.items[S.cur];
+    return it.c.some(function(c){return c.m.length===S.mods.length&&c.m.every(function(m){return S.mods.indexOf(m)>=0})&&!!S.key&&S.key.indexOf(c.k)>=0})}
+  function answer(ok){
+    var n=S.cur,first=!S.reviewed[n],p;
+    if(ok){
+      if(first){record(n,S.wrongRound?3:4);S.reviewed[n]=1}else{p=prog(n);p.c++;p.last=Date.now();save()}
+      if(!S.wrongRound){S.streak++;S.score+=10+Math.min(S.streak,5)*2;S.done++}
+    }else{
+      if(first){record(n,1);S.reviewed[n]=1}else{p=prog(n);p.w++;p.last=Date.now();save()}
+      S.streak=0;S.wrongRound=true;S.queue.splice(Math.min(3,S.queue.length),0,n);
+    }
+  }
+  function submit(){
+    if(!S.mods.length&&!S.key)return;
+    var ok=matches();
+    if(S.state==='waiting'){
+      answer(ok);
+      if(ok){S.state='correct';render();setTimeout(function(){if(S&&S.state==='correct')next()},900)}
+      else{S.state='wrong';S.mods=[];S.key=null;render()}
+    }else if(S.state==='wrong'){
+      if(ok)next();else{S.mods=[];S.key=null;S.shake=true;renderInput()}
+    }
+  }
+  function toWaiting(){var f=S.stage.querySelector('.qz-hint-in');if(f)saveHint(f.value);var p=prog(S.cur);if(!p.first){p.first=Date.now();save()}S.state='waiting';render()}
+
+  function inputArea(){
+    var has=S.mods.length||S.key;
+    return '<div class="qz-in'+(S.shake?' shake':'')+'">'+(has?capsHTML(S.mods,S.key,true):'<span class="qz-ph">Druk de toetsen één voor één…</span>')+'</div>'
+      +'<div class="qz-row"><button type="button" class="qz-b" data-a="reset"'+(has?'':' disabled')+'>✕ Opnieuw</button>'
+      +'<span class="qz-tip">↩ = controleren</span>'
+      +'<button type="button" class="qz-b" data-a="enter" title="Als de toets zelf Enter is">↩ als toets</button></div>';
+  }
+  function renderInput(){var el=S.stage.querySelector('.qz-inwrap');if(el)el.innerHTML=inputArea();S.shake=false}
+  function render(){
+    var n=S.cur,it=n&&D.items[n],st=S.state,h='';
+    var mast=S.names.filter(mastered).length;
+    h+='<div class="qz-top"><div class="qz-bar"><i style="width:'+(S.total?Math.round(100*S.done/S.total):0)+'%"></i></div>'
+      +'<span class="qz-pill'+(S.streak>2?' hot':'')+'" title="Reeks juist">🔥 '+S.streak+'</span>'
+      +'<span class="qz-pill" title="Punten">★ '+S.score+'</span>'
+      +'<span class="qz-pill" title="Onder de knie (interval ≥ 21 dagen)">✓ '+mast+'/'+S.names.length+'</span>'
+      +'<button type="button" class="qz-x" data-a="stop" title="Stoppen">×</button></div>';
+    if(st==='done'){
+      h+='<div class="qz-card done"><img class="qz-cat" src="'+CAT.o+'" alt=""><p class="qz-name">Sessie voltooid!</p><p class="qz-sc">'+S.score+' punten</p>'
+        +'<div class="qz-row c"><button type="button" class="qz-b main" data-a="again">Nieuwe ronde</button>'
+        +(Object.keys(S.reviewed).length?'<button type="button" class="qz-b" data-a="replay">Herhaal direct ('+Object.keys(S.reviewed).length+')</button>':'')+'</div></div>';
+      S.stage.innerHTML=h;return;
+    }
+    var hn=hint(n);
+    h+='<div class="qz-card"><img class="qz-cat" src="'+(st==='wrong'?CAT.z:CAT.o)+'" alt="">'
+      +(st==='intro'?'<p class="qz-new">✨ Nieuw ✨</p>':'')
+      +(it.cust?'<p class="qz-stamp">Dany-toets</p>':'')
+      +'<p class="qz-g">'+esc(it.g)+'</p><p class="qz-name">'+esc(n)+'</p>'
+      +(st==='waiting'&&hn?'<p class="qz-hint">💡 '+esc(hn)+'</p>':'')+'</div>';
+    if(st==='intro'){
+      h+='<div class="qz-strip intro"><div class="qz-ans">'+it.h+'</div>'
+        +'<label class="qz-lab">Ezelsbruggetje (mag leeg)</label><input class="qz-hint-in" type="text" value="'+esc(hn)+'" placeholder="Schrijf hier een geheugensteuntje…">'
+        +'<div class="qz-row c"><button type="button" class="qz-b main" data-a="go">Oefenen ↩</button></div></div>';
+    }else if(st==='waiting'){
+      h+='<div class="qz-strip"><div class="qz-inwrap">'+inputArea()+'</div></div>';
+    }else if(st==='correct'){
+      h+='<div class="qz-strip ok"><p class="qz-res">✓ Juist!</p><div class="qz-ans">'+it.h+'</div></div>';
+    }else if(st==='wrong'){
+      h+='<div class="qz-strip bad"><p class="qz-res">✕ Fout</p><div class="qz-ans"><span>Juist:</span> '+it.h+'</div>'
+        +'<input class="qz-hint-in" type="text" value="'+esc((P[n]&&P[n].hint)||'')+'" placeholder="Ezelsbruggetje toevoegen…">'
+        +'<p class="qz-lab">Typ de juiste combinatie om verder te gaan:</p><div class="qz-inwrap">'+inputArea()+'</div></div>';
+    }
+    S.stage.innerHTML=h;
+  }
+  function onKey(e){
+    if(!S||e.currentTarget!==S.stage)return;
+    var t=e.target;
+    if(t.tagName==='INPUT'){
+      if(e.key==='Enter'){e.preventDefault();saveHint(t.value);if(S.state==='intro')toWaiting();else S.stage.focus()}
+      e.stopPropagation();return;
+    }
+    e.preventDefault();e.stopPropagation();
+    if(e.repeat)return;
+    var st=S.state;
+    if(st==='intro'){if(e.key==='Enter')toWaiting();return}
+    if(st==='done'){if(e.key==='Enter')start(S.box,S.scope,S.all);return}
+    if(st==='correct')return;
+    if(e.key==='Enter'){submit();return}
+    var m=MODKEY[e.key];
+    if(m){var i=S.mods.indexOf(m);if(i>=0)S.mods.splice(i,1);else S.mods.push(m);renderInput();return}
+    var c=cands(e);if(!c.length)return;
+    S.key=(S.key&&S.key[0]===c[0])?null:c;renderInput();
+  }
+  function onClick(e){
+    var b=e.target.closest('[data-a]');if(!b||!S)return;var a=b.dataset.a;
+    if(a==='stop')return stop();
+    if(a==='reset'){S.mods=[];S.key=null;renderInput()}
+    else if(a==='enter'){S.key=['enter'];renderInput()}
+    else if(a==='go')toWaiting();
+    else if(a==='again')start(S.box,S.scope,S.all);
+    else if(a==='replay'){var r=Object.keys(S.reviewed);start(S.box,S.scope,S.all);S.queue=shuffle(r);S.total=r.length;S.done=0;next()}
+    if(S&&a!=='stop')S.stage.focus({preventScroll:true});
+  }
+  function stats(){
+    document.querySelectorAll('.qz').forEach(function(box){
+      box.querySelectorAll('.qz-go').forEach(function(b){
+        var ns=scopeNames(b.dataset.scope),m=ns.filter(mastered).length,d=ns.filter(function(n){return seen(n)&&isDue(n)}).length,nw=ns.filter(function(n){return !seen(n)}).length;
+        b.title=m+' onder de knie · '+d+' te herhalen · '+nw+' nieuw';
+        var s=b.querySelector('.qz-meter');if(!s){s=document.createElement('span');s.className='qz-meter';b.appendChild(s)}
+        s.style.setProperty('--p',(ns.length?Math.round(100*ns.filter(seen).length/ns.length):0)+'%');
+      });
+    });
+  }
+  document.querySelectorAll('.qz').forEach(function(box){
+    var stage=box.querySelector('.qz-stage');
+    stage.addEventListener('keydown',onKey);stage.addEventListener('click',onClick);
+    box.querySelectorAll('.qz-go').forEach(function(b){b.addEventListener('click',function(){start(box,b.dataset.scope,false)})});
+  });
+  stats();
+})();
+</script></body></html>

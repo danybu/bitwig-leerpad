@@ -1,0 +1,230 @@
+/* ── BITWIG STUDIEPROJECT — Manual Plus styling ─────────────────────── */
+
+/* PAGE WRAPPING — volle breedte met royale randpadding */
+body.bitwig-plus {
+  max-width: none;
+  margin: 0;
+  padding: 32px max(40px, 6vw);
+  background: #fff;
+  color: #212529;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* HEADINGS — extra adem boven belangrijke titels */
+body.bitwig-plus h1 { margin-top: 60px; margin-bottom: 18px; }
+body.bitwig-plus h2 { margin-top: 56px; margin-bottom: 14px; padding-top: 6px; }
+body.bitwig-plus h3 { margin-top: 36px; margin-bottom: 10px; }
+body.bitwig-plus h4 { margin-top: 24px; margin-bottom: 8px; }
+
+/* CHAPTER HEADER (de eerste banner) */
+.chapter-header {
+  border-bottom: 2px solid #1F2937;
+  padding-bottom: 16px;
+  margin-bottom: 12px;
+}
+.chapter-header h1 {
+  font-family: 'Montserrat', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 2.2em;
+  margin: 0 0 8px 0 !important;
+}
+.chapter-header .meta {
+  color: #6B7280;
+  font-size: 0.92em;
+  margin: 0;
+  font-style: italic;
+}
+
+/* INSERT CALLOUTS */
+aside.insert {
+  border-left: 4px solid;
+  padding: 14px 20px 12px 20px;
+  margin: 28px 0;
+  border-radius: 6px;
+  font-size: 0.96em;
+  line-height: 1.55;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+aside.insert .insert-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+aside.insert .insert-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  color: #fff;
+  font-size: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+aside.insert .insert-title {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-weight: 700;
+  font-size: 1.02em;
+  line-height: 1.3;
+}
+aside.insert .insert-body p {
+  margin: 8px 0;
+}
+aside.insert .insert-body p:first-child { margin-top: 0; }
+aside.insert .insert-body ul,
+aside.insert .insert-body ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+aside.insert .insert-body li { margin: 3px 0; }
+aside.insert .src {
+  margin-top: 12px !important;
+  font-size: 0.82em;
+  color: #6B7280;
+  font-style: italic;
+}
+aside.insert .src code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95em;
+  background: rgba(0,0,0,0.05);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-style: normal;
+}
+aside.insert table.shortcut-table {
+  border-collapse: collapse;
+  margin: 12px 0;
+  background: rgba(255,255,255,0.6);
+  width: auto;
+}
+aside.insert table.shortcut-table th,
+aside.insert table.shortcut-table td {
+  padding: 5px 12px;
+  text-align: left;
+  border: 1px solid rgba(0,0,0,0.1);
+  font-size: 0.94em;
+}
+aside.insert table.shortcut-table th {
+  font-weight: 600;
+  background: rgba(0,0,0,0.04);
+}
+aside.insert kbd {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  padding: 1px 7px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+  font-weight: 500;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+}
+
+/* Per bron-kleur */
+aside.insert-mc { border-color: #F0C419; background: #FFFBEB; }
+aside.insert-mc .insert-badge { background: #F0C419; }
+aside.insert-mc .insert-title { color: #92400E; }
+
+aside.insert-yt { border-color: #3B82F6; background: #EFF6FF; }
+aside.insert-yt .insert-badge { background: #3B82F6; }
+aside.insert-yt .insert-title { color: #1E40AF; }
+
+aside.insert-cl { border-color: #9CA3AF; background: #F9FAFB; }
+aside.insert-cl .insert-badge { background: #9CA3AF; }
+aside.insert-cl .insert-title { color: #4B5563; }
+
+aside.insert-mn { border-color: #16A34A; background: #F0FDF4; }
+aside.insert-mn .insert-badge { background: #16A34A; }
+aside.insert-mn .insert-title { color: #166534; }
+
+/* Verberg page-internal navigation als die door HTML cleanup heen sluipt */
+.bitwig_userguide_header, .bitwig_userguide_footer, .userguide-search, .userguide-toc-button { display: none !important; }
+
+/* OVERRIDE Bitwig Bootstrap grid: content-kolom moet volle breedte hebben
+   (op de live site is rechterkolom een sidebar/TOC; die hebben we verwijderd) */
+body.bitwig-plus .row { display: block !important; margin: 0 !important; width: 100% !important; }
+body.bitwig-plus [class*="col-"] {
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+body.bitwig-plus .container, body.bitwig-plus .container-fluid { max-width: 100% !important; padding: 0 !important; }
+body.bitwig-plus .userguide-main { max-width: 100% !important; flex: 0 0 100% !important; }
+/* Verberg de (lege) rechter sidebar kolom volledig */
+body.bitwig-plus .userguide-right { display: none !important; }
+
+/* ── EDIT TOOLBAR ───────────────────────────────────────────────── */
+#edit-toolbar {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 99999;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: rgba(255,255,255,0.95);
+  padding: 6px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-family: -apple-system, sans-serif;
+  font-size: 13px;
+  user-select: none;
+}
+#edit-toolbar button {
+  border: 0;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: inherit;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity 0.15s, transform 0.05s;
+}
+#edit-toolbar button:hover { opacity: 0.85; }
+#edit-toolbar button:active { transform: translateY(1px); }
+#edit-toolbar button.btn-edit  { background: #2563EB; }
+#edit-toolbar button.btn-save  { background: #16A34A; }
+#edit-toolbar button.btn-cancel{ background: #6B7280; }
+#edit-toolbar .edit-status {
+  color: #6B7280;
+  font-size: 12px;
+  margin-left: 6px;
+  font-style: italic;
+}
+body.editing { outline: 3px dashed #2563EB; outline-offset: -3px; }
+body.editing #edit-toolbar { background: #FEF3C7; box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+#edit-flash {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #16A34A;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: -apple-system, sans-serif;
+  font-size: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 99999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  max-width: 80vw;
+  text-align: center;
+}
+#edit-flash.show { opacity: 1; }
+
+/* Print/screenshot vriendelijk: verberg toolbar bij print */
+@media print {
+  #edit-toolbar, #edit-flash { display: none !important; }
+}

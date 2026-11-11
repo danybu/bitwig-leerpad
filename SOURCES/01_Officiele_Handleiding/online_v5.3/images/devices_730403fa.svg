@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="19px" height="19px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect id="device_view" x="-0" y="0" width="19" height="19" style="fill:none;"/>
+    <g id="device_view1" serif:id="device_view">
+        <g>
+            <path d="M17,4.482C17,3.112 15.888,2 14.518,2L4.482,2C3.112,2 2,3.112 2,4.482L2,14.518C2,15.888 3.112,17 4.482,17L14.518,17C15.888,17 17,15.888 17,14.518L17,4.482Z" style="fill-opacity:0.3;"/>
+            <path d="M17,4.482L17,14.518C17,15.888 15.888,17 14.518,17L4.482,17C3.112,17 2,15.888 2,14.518L2,4.482C2,3.112 3.112,2 4.482,2L14.518,2C15.888,2 17,3.112 17,4.482ZM16,4.482C16,3.664 15.336,3 14.518,3L4.482,3C3.664,3 3,3.664 3,4.482L3,14.518C3,15.336 3.664,16 4.482,16L14.518,16C15.336,16 16,15.336 16,14.518L16,4.482Z"/>
+            <rect x="2.882" y="3" width="3.118" height="13"/>
+        </g>
+    </g>
+</svg>

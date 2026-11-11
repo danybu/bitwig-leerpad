@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitwig Modulators — Leerplan</title>
+<style>
+  :root {
+    --bg: #f7f6f2;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: #ddd8d0;
+    --border-light: #ece8e2;
+    --accent: #2a52be;
+    --accent2: #6b3fa0;
+    --accent3: #1a7f5a;
+    --accent4: #b45309;
+    --accent5: #c0392b;
+    --text: #1a1a1a;
+    --text-muted: #555550;
+    --text-dim: #999990;
+    --done: #1a7f5a;
+    --fase1-col: #2a52be;
+    --fase2-col: #6b3fa0;
+    --fase3-col: #1a7f5a;
+    --fase4-col: #b45309;
+    --fase5-col: #c0392b;
+    --fase6-col: #374151;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 3px solid var(--accent);
+    padding: 48px 56px 36px;
+  }
+  header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
+    font-family: Georgia, serif;
+  }
+  header h1 span { color: var(--accent); }
+  header .subtitle {
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-size: 15px;
+    font-style: italic;
+    font-family: Georgia, serif;
+  }
+  .progress-bar-wrap {
+    margin-top: 24px;
+    background: var(--surface2);
+    border-radius: 100px;
+    height: 7px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    max-width: 420px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 7px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .progress-label span { color: var(--accent); font-weight: 600; }
+
+  /* NAV */
+  nav {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 56px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    padding: 13px 18px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.1px;
+  }
+  nav a:hover { color: var(--text); border-color: var(--border); }
+  nav a.active { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+  /* MAIN */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 52px 32px 80px;
+  }
+
+  /* INTRO BOX */
+  .intro-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+  .intro-box h2 {
+    font-size: 15px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .intro-box p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* FASE */
+  .fase {
+    margin-bottom: 64px;
+  }
+  .fase-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 28px;
+    cursor: pointer;
+    user-select: none;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .fase-number {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px;
+    flex-shrink: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .fase-title { flex: 1; }
+  .fase-title h2 {
+    font-size: 20px;
+    font-weight: 700;
+    font-family: Georgia, serif;
+    letter-spacing: -0.2px;
+  }
+  .fase-title p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-style: italic;
+    font-family: Georgia, serif;
+  }
+  .fase-chevron {
+    color: var(--text-dim);
+    font-size: 18px;
+    transition: transform 0.3s;
+  }
+  .fase.collapsed .fase-chevron { transform: rotate(-90deg); }
+  .fase-body { display: block; }
+  .fase.collapsed .fase-body { display: none; }
+
+  /* FASE COLORS */
+  .fase-1 .fase-number { background: #eef1fb; color: var(--fase1-col); border: 1px solid #c5cff5; }
+  .fase-1 .fase-header { border-color: #c5cff5; }
+  .fase-1 .fase-title h2 { color: var(--fase1-col); }
+
+  .fase-2 .fase-number { background: #f3eefb; color: var(--fase2-col); border: 1px solid #d5bff5; }
+  .fase-2 .fase-header { border-color: #d5bff5; }
+  .fase-2 .fase-title h2 { color: var(--fase2-col); }
+
+  .fase-3 .fase-number { background: #edf7f2; color: var(--fase3-col); border: 1px solid #b8e0cf; }
+  .fase-3 .fase-header { border-color: #b8e0cf; }
+  .fase-3 .fase-title h2 { color: var(--fase3-col); }
+
+  .fase-4 .fase-number { background: #fdf6ed; color: var(--fase4-col); border: 1px solid #f0d5a8; }
+  .fase-4 .fase-header { border-color: #f0d5a8; }
+  .fase-4 .fase-title h2 { color: var(--fase4-col); }
+
+  .fase-5 .fase-number { background: #fdf0ee; color: var(--fase5-col); border: 1px solid #f0b8b2; }
+  .fase-5 .fase-header { border-color: #f0b8b2; }
+  .fase-5 .fase-title h2 { color: var(--fase5-col); }
+
+  .fase-6 .fase-number { background: #f3f4f6; color: var(--fase6-col); border: 1px solid #d1d5db; }
+  .fase-6 .fase-header { border-color: #d1d5db; }
+  .fase-6 .fase-title h2 { color: var(--fase6-col); }
+
+  /* MODULATOR CARD */
+  .mod-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .mod-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); border-color: #c5c0b8; }
+  .mod-card.done {
+    border-color: #b8dece;
+    background: #f5fcf8;
+  }
+  .mod-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px 24px 18px;
+  }
+  .mod-check {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 3px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    background: var(--surface2);
+  }
+  .mod-check:hover { border-color: var(--accent); background: #eef1fb; }
+  .mod-card.done .mod-check {
+    background: var(--done);
+    border-color: var(--done);
+  }
+  .mod-check::after {
+    content: '✓';
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    display: none;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .mod-card.done .mod-check::after { display: block; }
+
+  .mod-info { flex: 1; }
+  .mod-name {
+    font-weight: 700;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-family: Georgia, serif;
+    color: var(--text);
+  }
+  .mod-name .tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 100px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .tag-basis { background: #eef1fb; color: var(--fase1-col); border: 1px solid #c5cff5; }
+  .tag-rtym  { background: #f3eefb; color: var(--fase2-col); border: 1px solid #d5bff5; }
+  .tag-env   { background: #edf7f2; color: var(--fase3-col); border: 1px solid #b8e0cf; }
+  .tag-note  { background: #fdf6ed; color: var(--fase4-col); border: 1px solid #f0d5a8; }
+  .tag-audio { background: #fdf0ee; color: var(--fase5-col); border: 1px solid #f0b8b2; }
+  .tag-route { background: #f3f4f6; color: var(--fase6-col); border: 1px solid #d1d5db; }
+  .tag-gevorderd { background: #fdf6ed; color: var(--fase4-col); border: 1px solid #f0d5a8; }
+
+  .mod-desc {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.75;
+    font-family: Georgia, serif;
+  }
+  .mod-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .mod-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-weight: 500;
+  }
+  .mod-link.yt {
+    background: #fdf0ee;
+    border-color: #f0b8b2;
+    color: #a02020;
+  }
+  .mod-link.yt:hover { background: #fae0dc; border-color: #e08070; }
+  .mod-link.manual {
+    background: #eef1fb;
+    border-color: #c5cff5;
+    color: var(--accent);
+  }
+  .mod-link.manual:hover { background: #dce3f8; }
+
+  /* NOTES */
+  .mod-note {
+    background: #fffbf0;
+    border-top: 1px solid #f0e8c8;
+    padding: 12px 24px 14px;
+    font-size: 14px;
+    color: #7a6a40;
+    font-style: italic;
+    font-family: Georgia, serif;
+    line-height: 1.65;
+  }
+  .mod-note strong { color: #5a4a20; font-style: normal; font-weight: 700; }
+
+  /* GROUP HEADER within fase */
+  .group-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 36px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-light);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 44px;
+    padding: 18px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  /* MANUAL TIP BOX */
+  .tip-box {
+    background: #f0f4fe;
+    border: 1px solid #c5cff5;
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 28px 0 20px;
+    font-size: 14px;
+    color: #3a4a7a;
+    font-family: Georgia, serif;
+    line-height: 1.7;
+  }
+  .tip-box strong { color: var(--accent); font-style: normal; }
+
+  /* RESOURCES SECTION */
+  .resources {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 32px;
+    margin-top: 56px;
+  }
+  .resources h2 {
+    font-size: 19px;
+    margin-bottom: 20px;
+    font-family: Georgia, serif;
+    color: var(--text);
+  }
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .resource-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    display: block;
+  }
+  .resource-card:hover { border-color: var(--accent); background: #eef1fb; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .resource-card .rc-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 4px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-weight: 700;
+  }
+  .resource-card .rc-title {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: Georgia, serif;
+  }
+  .resource-card .rc-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  @media (max-width: 640px) {
+    header { padding: 32px 20px 24px; }
+    nav { padding: 0 16px; }
+    main { padding: 32px 16px 52px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Bitwig Studio — <span>Modulators Leerplan</span></h1>
+  <p class="subtitle">Alle 30+ modulators uit de <em>Bitwig Modulators Explained</em> playlist · Manual v5.3 · gegroepeerd per type</p>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <p class="progress-label"><span id="progressText">0</span> modulators afgewerkt</p>
+</header>
+
+<nav>
+  <a href="#fase1" class="active">1 · Interface</a>
+  <a href="#fase2">2 · LFO's</a>
+  <a href="#fase3">3 · Enveloppen</a>
+  <a href="#fase4">4 · MIDI & Noten</a>
+  <a href="#fase5">5 · Audio & Steps</a>
+  <a href="#fase6">6 · Routing & Mix</a>
+  <a href="#bronnen">Bronnen</a>
+</nav>
+
+<main>
+
+  <div class="intro-box">
+    <h2>🎛️ Wat is het Unified Modulation System?</h2>
+    <p>Modulators zijn speciale Bitwig-modules die parameters automatisch aansturen — zoals een patch-cord in een modulaire synthesizer. Elke parameter van elk device kan erdoor aangestuurd worden, en je kunt er zoveel laden als je wil. Dit leerplan volgt de <strong>Bitwig Modulators Explained</strong> playlist van het BitwigGuide/Polarity-kanaal. Zet een vinkje zodra je een modulator hebt bestudeerd.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="tag tag-basis">Interface</span> Handmatige knoppen</div>
+    <div class="legend-item"><span class="tag tag-rtym">LFO</span> Oscillerend signaal</div>
+    <div class="legend-item"><span class="tag tag-env">Envelope</span> Noot-getriggerd</div>
+    <div class="legend-item"><span class="tag tag-note">MIDI/Noot</span> Nootdata als bron</div>
+    <div class="legend-item"><span class="tag tag-audio">Audio/Stap</span> Audio of sequencer</div>
+    <div class="legend-item"><span class="tag tag-route">Routing</span> Signaalverdeling</div>
+  </div>
+
+  <!-- ===================== FASE 1 ===================== -->
+  <div class="fase fase-1" id="fase1">
+    <div class="fase-header" onclick="toggleFase(this)">
+      <div class="fase-number">1</div>
+      <div class="fase-title">
+        <h2>Fase 1 — Interface Controls: handmatige modulatie</h2>
+        <p>Knoppen en schakelaars die je zelf bedient en aan meerdere parameters koppelt.</p>
+      </div>
+      <div class="fase-chevron">▾</div>
+    </div>
+    <div class="fase-body">
+
+      <div class="tip-box">
+        <strong>Begin hier:</strong> Lees Ch16 van de handleiding (MANUAL_PLUS map) — sectie "The Unified Modulation System". Je leert hoe je een modulator toevoegt, op een routing-knop klikt, een parameter aanklikt, en de modulatie-hoeveelheid instelt. Dat principe geldt voor élke modulator in dit plan.
+      </div>
+
+      <div class="group-label">Systeem begrijpen</div>
+
+      <div class="mod-card" data-id="basics">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Hoe het modulatiesysteem werkt <span class="tag tag-basis">Startpunt</span></div>
+            <div class="mod-desc">Modulator toevoegen → routing-knop klikken → parameter aanwijzen → modulation amount slepen. De blauwe ring rond een parameter toont dat hij gemoduleerd wordt. Dit patroon is altijd hetzelfde.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=WbJKjwwEIGk" class="mod-link yt" target="_blank">▶ Modulator Basics (Part 1/3)</a>
+              <a href="https://www.youtube.com/watch?v=mTxDMkKWqIg" class="mod-link yt" target="_blank">▶ E13: All Modulator Devices</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Oefening:</strong> Laad een synth, voeg een LFO toe, route naar Filter Cutoff, stel de amount in. Luister wat er gebeurt.</div>
+      </div>
+
+      <div class="group-label">Interface Controls — bedienbaar met de hand</div>
+
+      <div class="mod-card" data-id="macro">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Macro <span class="tag tag-basis">Interface</span></div>
+            <div class="mod-desc">Een draaiknop die je handmatig bedient en die meerdere parameters tegelijk kan aansturen. Ideaal voor het exposeren van "interessante parameters" van een preset. Eén Macro kan Filter Cutoff, Reverb Mix en Detune gelijktijdig bewegen.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=muFohJrBJIs" class="mod-link yt" target="_blank">▶ Macro — Bitwig Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-06-27-macro-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Masterclass-tip:</strong> Speel met de macro's van een preset om te begrijpen wat de maker "interessant" vond aan de sound.</div>
+      </div>
+
+      <div class="mod-card" data-id="macro4">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Macro-4 <span class="tag tag-basis">Interface</span></div>
+            <div class="mod-desc">Vier macro-knobs in één compacte module — functioneel identiek aan vier losse Macro's maar ruimtebesparend. Handig voor het bouwen van een interface met meerdere handmatige controlepunten.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=wwvFlmbzz4g" class="mod-link yt" target="_blank">▶ Macro-4 — Bitwig Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-06-28-macro-4-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="button">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Button <span class="tag tag-basis">Interface</span></div>
+            <div class="mod-desc">Een aan/uit-schakelaar die bij activering een vaste waarde naar een parameter stuurt. Handig om een effect in/uit te schakelen of een preset-instelling te "locken". Heeft smoothing zodat er geen klik-geluiden optreden bij schakelen.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=JRy3k4jMPuI" class="mod-link yt" target="_blank">▶ Button — Bitwig Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-05-05-button-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="globals">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Globals <span class="tag tag-basis">Interface</span></div>
+            <div class="mod-desc">Reageert op globale projectstatus: Fill aan/uit, A/B-crossfade (voor twee arrangementen), en de Play-knop. Hiermee kun je parameters laten meebewegen met de transportstatus van je project.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=h2MKPPrq63U" class="mod-link yt" target="_blank">▶ Globals — Bitwig Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-06-03-globals-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Gebruik:</strong> Laat een reverb-mix automatisch groter worden wanneer Fill actief is, zonder handmatige automatie te schrijven.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== FASE 2 ===================== -->
+  <div class="fase fase-2" id="fase2">
+    <div class="fase-header" onclick="toggleFase(this)">
+      <div class="fase-number">2</div>
+      <div class="fase-title">
+        <h2>Fase 2 — LFO's: periodiek oscillerende modulatie</h2>
+        <p>Golfvormen die continu heen en weer bewegen — van trage filter-sweep tot audio-rate FM-synthese.</p>
+      </div>
+      <div class="fase-chevron">▾</div>
+    </div>
+    <div class="fase-body">
+
+      <div class="tip-box">
+        <strong>Concept:</strong> Een LFO genereert een herhalend signaal. <em>Rate</em> bepaalt de snelheid, <em>modulation amount</em> de diepte. Bitwig heeft meerdere LFO-varianten: vrij lopend, tempogesynchroniseerd, drawable, en zelfs audio-snelheid.
+      </div>
+
+      <div class="group-label">Vrij lopende LFO's</div>
+
+      <div class="mod-card" data-id="lfo">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">LFO <span class="tag tag-rtym">LFO</span></div>
+            <div class="mod-desc">De hoofd-LFO van Bitwig. Heeft unieke features: morfeerbare wavetable-golfvormen, pitch-following (de LFO-snelheid volgt de gespeelde noot), delay en fade-in, en polyfone werking per stem. Kan ook op audio-snelheid lopen voor FM-achtige effecten.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=LAaIyzw91LA" class="mod-link yt" target="_blank">▶ Hoe de LFO gebruiken</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-06-24-lfo-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Verwar niet met:</strong> Wavetable LFO (zie hieronder) — dat is een aparte variant. De LFO-basis hier is de meest veelzijdige.</div>
+      </div>
+
+      <div class="mod-card" data-id="wavetable-lfo">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Wavetable LFO <span class="tag tag-rtym">LFO</span></div>
+            <div class="mod-desc">Gebruikt de wavetables van Bitwig (dezelfde als in de Wavetable-synthesizer) als LFO-golfvorm. Je kunt morferen tussen complexe golfvormen, bipolar/unipolar schakelen, en polyfoon laten werken. Bijzonder voor rijke, evoluerende modulaties.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=kS8pqAirNas" class="mod-link yt" target="_blank">▶ Wavetable LFO — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2023-04-11-wavetable-lfo-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="classic-lfo">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Classic LFO <span class="tag tag-rtym">LFO</span></div>
+            <div class="mod-desc">LFO met discrete, vaste golfvormen (sinus, driehoek, blokgolf, zaagtand, S&H). Geen morfing. Simpeler te begrijpen dan de hoofd-LFO — goed startpunt voor klassieke synthesizer-modulatie.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=3AKKkiqr6zE" class="mod-link yt" target="_blank">▶ Classic LFO — Modulator Guide</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group-label">Tempogesynchroniseerde LFO's</div>
+
+      <div class="mod-card" data-id="beat-lfo">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Beat LFO <span class="tag tag-rtym">LFO</span></div>
+            <div class="mod-desc">LFO die gesynchroniseerd is met het projecttempo. Rate wordt uitgedrukt in nootwaarden (1/4, 1/8, 1/16…). Kan naadloos tussen divisies morferen zonder de sync te verliezen. Ideaal voor ritmische filter-sweeps en tremolo exact op de maat.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=3_1gIUYgPww" class="mod-link yt" target="_blank">▶ Beat LFO — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-05-02-beat-lfo-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Verschil:</strong> LFO loopt vrij in Hz; Beat LFO loopt in sync met het tempo.</div>
+      </div>
+
+      <div class="group-label">Drawable LFO's</div>
+
+      <div class="mod-card" data-id="curves-lfo">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Curves LFO <span class="tag tag-rtym">LFO</span></div>
+            <div class="mod-desc">Teken je eigen LFO-golfvorm op een raster. Synchroniseer met tempo, stel groove en smoothing in, en werk polyfoon of monofoon. Krachtig voor unieke ritmische of melodische modulatiepatronen die je niet met standaard golfvormen kunt maken.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=WcKh3R0ZTcM" class="mod-link yt" target="_blank">▶ Curves LFO — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2023-04-12-curves-lfo-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group-label">Speciale LFO-vormen</div>
+
+      <div class="mod-card" data-id="ramp">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Ramp <span class="tag tag-rtym">LFO</span></div>
+            <div class="mod-desc">Genereert een lineaire helling van 0 naar 1 over een ingestelde tijd, optioneel met loop of eenmalig. Nuttig voor het syncroniseren van sampleposities in een sampler, tempo-matched loops uitrekken, of als simpele one-shot sweeper.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=cpKI31dnTHo" class="mod-link yt" target="_blank">▶ Ramp — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-08-01-ramp-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="audio-rate">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Audio Rate <span class="tag tag-rtym">LFO</span></div>
+            <div class="mod-desc">Een LFO die zo snel kan draaien dat hij in het hoorbare frequentiebereik (> 20 Hz) belandt. Hiermee maak je FM-synthese-achtige effecten. Stel de snelheid in op bijv. 440 Hz en route naar pitch voor klassieke FM. Gevorderd maar fascinerend.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=DDewhp0Fv3M" class="mod-link yt" target="_blank">▶ Audio Rate — Modulator Guide</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Tip:</strong> Begin met Audio Rate op een eenvoudige sinus-naar-pitch routing om FM-synthese intuïtief te begrijpen.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== FASE 3 ===================== -->
+  <div class="fase fase-3" id="fase3">
+    <div class="fase-header" onclick="toggleFase(this)">
+      <div class="fase-number">3</div>
+      <div class="fase-title">
+        <h2>Fase 3 — Enveloppen: noot-getriggerde beweging</h2>
+        <p>Eenmalige bewegingen die getriggerd worden door het aanspelen of loslaten van een noot.</p>
+      </div>
+      <div class="fase-chevron">▾</div>
+    </div>
+    <div class="fase-body">
+
+      <div class="tip-box">
+        <strong>Concept:</strong> Een envelope reageert op "noot-aan" (note-on) en "noot-los" (note-off) signalen. In tegenstelling tot een LFO is het niet periodiek — het voert één beweging uit per noot. Klassiek gebruik: filter openen bij aanspelen, sluiten bij loslaten.
+      </div>
+
+      <div class="group-label">Klassieke enveloppen</div>
+
+      <div class="mod-card" data-id="adsr">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">ADSR <span class="tag tag-env">Envelope</span></div>
+            <div class="mod-desc">Attack – Decay – Sustain – Release. De klassieke synthesizer-envelope. Attack = hoe snel de waarde stijgt; Decay = hoe snel hij daalt naar Sustain; Sustain = het niveau terwijl de noot aangehouden wordt; Release = hoe snel hij wegglijdt na loslaten.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=crwEQIizrzE" class="mod-link yt" target="_blank">▶ ADSR — Modulator Guide</a>
+              <a href="https://www.youtube.com/watch?v=7RCpPM2kPv8" class="mod-link yt" target="_blank">▶ ADSR & AHDSR uitgelegd</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Klassiek gebruik:</strong> Route ADSR naar filter cutoff. Korte attack + korte decay = perkussief "wah"; lange attack + hoge sustain = pad-achtig zwellen.</div>
+      </div>
+
+      <div class="mod-card" data-id="ahdsr">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">AHDSR <span class="tag tag-env">Envelope</span></div>
+            <div class="mod-desc">Attack – Hold – Decay – Sustain – Release. De Hold-fase houdt het piekniveau even vast vóór de Decay. Handig voor punchy leads waarbij de piek iets langer zichtbaar moet blijven, of wanneer je een precies afgebakend "top-moment" wil.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=H1MlJD7hdkc" class="mod-link yt" target="_blank">▶ AHDSR — Modulator Guide</a>
+              <a href="https://www.youtube.com/watch?v=aim9Oy0tgk8" class="mod-link yt" target="_blank">▶ More control with ADSR & AHDSR</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group-label">Geavanceerde enveloppen</div>
+
+      <div class="mod-card" data-id="4stage">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">4-Stage <span class="tag tag-env">Envelope</span></div>
+            <div class="mod-desc">Vier volledig vrij instelbare segmenten, elk met eigen tijd, niveau en curvevorm (convex, lineair, concaaf). Kan ook looppen — dan fungeert hij als een complexe LFO. Bijzonder flexibel voor bewegingen die je niet met ADSR kunt maken.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=3AGZImL4KYM" class="mod-link yt" target="_blank">▶ 4-Stage — Modulator Guide</a>
+              <a href="https://www.youtube.com/watch?v=WBhqMdaP0z0" class="mod-link yt" target="_blank">▶ 4-Stage, ADSR, AHDSR & Env. Follower</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="segments">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Segments <span class="tag tag-env">Envelope</span></div>
+            <div class="mod-desc">Een multi-stage envelope waarbij je de vorm volledig vrij tekent op een canvas. Definieer sustain-punten, kies afspeelmodus (one-shot, hold, repeat, ping-pong), en synchroniseer met het tempo. Werkt ook op audio-snelheid. Het meest flexibele envelope-device in Bitwig.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=8UaDCxbGjs0" class="mod-link yt" target="_blank">▶ Segments — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2023-04-13-segments-envelope-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Let op:</strong> Segments is zowel LFO als envelope — afhankelijk van de afspeelmodus.</div>
+      </div>
+
+      <div class="group-label">Envelope Follower</div>
+
+      <div class="mod-card" data-id="envelope-follower">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Envelope Follower <span class="tag tag-env">Envelope</span></div>
+            <div class="mod-desc">Volgt de amplitude (luidheid) van het directe audiosignaal dat het device ontvangt en zet dat om in een modulatiebron. Verschil met Audio Sidechain: Envelope Follower leest alleen het eigen signaal, geen extern kanaal. Goed voor auto-wah, vocoder-achtige filtering.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=U4epZpDLo1A" class="mod-link yt" target="_blank">▶ Envelope Follower — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-04-28-envelope-follower-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Vergelijk met Audio Sidechain:</strong> die leest audio van een andere track. Envelope Follower leest het eigen signaal.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== FASE 4 ===================== -->
+  <div class="fase fase-4" id="fase4">
+    <div class="fase-header" onclick="toggleFase(this)">
+      <div class="fase-number">4</div>
+      <div class="fase-title">
+        <h2>Fase 4 — MIDI & Nootsignalen als modulatiebron</h2>
+        <p>Pitch, velocity, CC-waarden, MIDI-kanalen en noottelgegevens omgezet naar modulatiesignalen.</p>
+      </div>
+      <div class="fase-chevron">▾</div>
+    </div>
+    <div class="fase-body">
+
+      <div class="tip-box">
+        <strong>Concept:</strong> In plaats van een golfvorm als bron, gebruiken deze modulators noot- en MIDI-informatie. De gespeelde noot (Keytrack), hoe hard je speelt (Expressions/velocity), welk MIDI-kanaal actief is (Channel-16) — allemaal omzetbaar naar modulatie.
+      </div>
+
+      <div class="group-label">Toonhoogte-gebaseerd</div>
+
+      <div class="mod-card" data-id="keytrack">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Keytrack <span class="tag tag-note">MIDI/Noot</span></div>
+            <div class="mod-desc">Zet de pitch van de gespeelde noot om in een modulatiewaarde. Hoge noot → hoge waarde. Klassiek gebruik: filter cutoff mee laten stijgen met de noot, zodat hoge noten niet te donker klinken. Stel center (neutrale noot) en spread (gevoeligheid) in.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=PElu3c26QLs" class="mod-link yt" target="_blank">▶ Keytrack — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-06-23-keytrack-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="keytrack-plus">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Keytrack Plus <span class="tag tag-note">MIDI/Noot</span></div>
+            <div class="mod-desc">Geavanceerde variant van Keytrack met een grafische interface: teken per noot een eigen modulatiewaarde op een curve. Hiermee kun je niet-lineaire key-tracking bouwen — bijv. de lage octaven zwaar filteren en de hoge octaven open laten, met een S-curve ertussen.</div>
+            <div class="mod-links">
+              <a href="https://polarity.me/posts/bitwig-guides/2023-04-14-keytrack-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel + video</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="pitch12">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Pitch-12 <span class="tag tag-note">MIDI/Noot</span></div>
+            <div class="mod-desc">Geeft elke toonklasse (C, C#, D… B) een eigen modulatiewaarde. Ideaal voor microtonale expressie of het koppelen van specifieke noten aan specifieke timbre-wijzigingen. Elke noot in het octaaf heeft een aparte output-handle.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=xfJldI5HB_Q" class="mod-link yt" target="_blank">▶ Pitch-12 — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-07-26-pitch-12-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group-label">Uitdrukkingsdata (velocity, pressure, timbre)</div>
+
+      <div class="mod-card" data-id="expressions">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Expressions <span class="tag tag-note">MIDI/Noot</span></div>
+            <div class="mod-desc">Haalt per-noot expressiedata op: velocity, channel pressure (aftertouch), release velocity, en timbre (MPE). Elk van deze expressies kan onafhankelijk naar een parameter gerouteerd worden. Sleutel tot MPE-controllers en levende, ademende sounds.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=xc73bJxvplA" class="mod-link yt" target="_blank">▶ Expressions — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-05-31-expressions-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>MPE-tip:</strong> Met een MPE-controller (bijv. Roli Seaboard) kun je per noot afzonderlijk filteren, buigen en moduleren via Expressions.</div>
+      </div>
+
+      <div class="group-label">MIDI-controllers & kanalen</div>
+
+      <div class="mod-card" data-id="midi">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">MIDI <span class="tag tag-note">MIDI/Noot</span></div>
+            <div class="mod-desc">Leest elk MIDI-controller-signaal: CC-waarden (mod wheel, expression pedal…), pitch bend, channel pressure. Gebruik de "Learn"-functie om een hardware-knop te leren. Filtert op MIDI-kanaal en ondersteunt per-voice werking.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=0uZNVG-AyR0" class="mod-link yt" target="_blank">▶ MIDI — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-07-12-midi-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="channel16">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Channel-16 <span class="tag tag-note">MIDI/Noot</span></div>
+            <div class="mod-desc">Heeft 16 handles — één per MIDI-kanaal. Stuur noten op verschillende kanalen en elke noot triggert een andere modulatiewaarde. Hiermee maak je kanaalsafhankelijke timbre-variaties: C op kanaal 1 klinkt anders dan C op kanaal 2.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=yLKbC-B704M" class="mod-link yt" target="_blank">▶ Channel-16 — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-04-26-channel-16-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group-label">Noot-events als trigger</div>
+
+      <div class="mod-card" data-id="note-sidechain">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Note Sidechain <span class="tag tag-note">MIDI/Noot</span></div>
+            <div class="mod-desc">Ontvangt nootsignalen van een andere track en zet die om in een envelope-achtige modulatie. Klassiek: laat de kick-drum-track een envelope triggeren die het volume van de bas elke beat kort omlaag duwt (ducking) — zonder audio nodig te hebben.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=bvFB61cLSTE" class="mod-link yt" target="_blank">▶ Note Sidechain — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-07-18-note-sidechain-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="note-counter">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Note Counter <span class="tag tag-note">MIDI/Noot</span></div>
+            <div class="mod-desc">Telt gespeelde noten en verhoogt bij elke noot de modulatiewaarde met een instelbare stap. Na het gewenste aantal noten begint het opnieuw. Nuttig voor polyritmische, asymmetrische modulatiecycli die losstaan van het tempo.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=D02OjIkBdlM" class="mod-link yt" target="_blank">▶ Note Counter — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-07-14-note-counter-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== FASE 5 ===================== -->
+  <div class="fase fase-5" id="fase5">
+    <div class="fase-header" onclick="toggleFase(this)">
+      <div class="fase-number">5</div>
+      <div class="fase-title">
+        <h2>Fase 5 — Audio, Steps & Kans</h2>
+        <p>Audiosignalen, step-sequencers, sample-and-hold en willekeurige variatie als modulatiebron.</p>
+      </div>
+      <div class="fase-chevron">▾</div>
+    </div>
+    <div class="fase-body">
+
+      <div class="group-label">Audiosignaal als modulatiebron</div>
+
+      <div class="mod-card" data-id="audio-sidechain">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Audio Sidechain <span class="tag tag-audio">Audio</span></div>
+            <div class="mod-desc">Leest een audiosignaal van een andere track en zet de amplitude ervan om in een modulatiebron. Klassiek: kick-drum duckt de bas. Maar ook: het vocaal-signaal moduleert de reverb-mix, of drums sturen een filter op een synth aan.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=aGCx20ICdRk" class="mod-link yt" target="_blank">▶ Audio Sidechain (tutorial)</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-04-29-audio-sidechain-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Verschil met Envelope Follower:</strong> Envelope Follower leest het eigen signaal; Audio Sidechain leest een externe track.</div>
+      </div>
+
+      <div class="group-label">Step-sequencers als modulator</div>
+
+      <div class="mod-card" data-id="steps">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Steps <span class="tag tag-audio">Stap</span></div>
+            <div class="mod-desc">Een step-sequencer als modulator. Elke stap heeft een eigen waarde. Afspeelrichtingen: voorwaarts, achterwaarts, ping-pong. Synchroniseert met tempo en groove. Kan ook per-voice polyfoon werken. Ideaal voor ritmische patroonmodulatie van filter, pitch of volume.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=laRIqPEThJE" class="mod-link yt" target="_blank">▶ Complete guide: Steps modulator</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-08-08-steps-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="parseq8">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Parsec-8 <span class="tag tag-audio">Stap</span></div>
+            <div class="mod-desc">Een 8-staps bipolaire step-sequencer met individuele output-handles per stap. Iedere stap kan afzonderlijk gemoduleerd worden — bijv. met een LFO per stap. Ondersteunt phase offset, smoothing, en kan zelfs als tekst-gestuurd oscillator werken.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=heMj35TKWtc" class="mod-link yt" target="_blank">▶ Parsec-8 — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-07-26-parseq-8-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Verschil met Steps:</strong> Steps tekent waarden per stap; Parsec-8 heeft per stap een aparte output-handle die je onafhankelijk kunt gebruiken.</div>
+      </div>
+
+      <div class="group-label">Sample & Hold en Quantize</div>
+
+      <div class="mod-card" data-id="samplehold">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Sample &amp; Hold <span class="tag tag-audio">Stap</span></div>
+            <div class="mod-desc">Neemt een "snapshot" van een ingangssignaal op het gewenste moment en houdt die waarde vast tot de volgende sample. Maakt gestapte, kwantitatieve modulatie van een continu signaal. Kan polyfoon werken — elke noot krijgt zijn eigen vastgehouden waarde.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=6yxIJ3TRvJ4" class="mod-link yt" target="_blank">▶ Sample &amp; Hold — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-08-03-sample-andamp-hold-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="quantize">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Quantize <span class="tag tag-audio">Stap</span></div>
+            <div class="mod-desc">Verdeelt elk modulatiesignaal in een instelbaar aantal stappen. Een LFO-sinus wordt zo een traplijn. Kies lineaire, logaritmische, exponentiële of sinus-verdeling. Handig voor het koppelen van modulatie aan noten of vaste intervallen.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=72VN1lnE6FY" class="mod-link yt" target="_blank">▶ Quantize — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-07-29-quantize-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group-label">Willekeurige variatie</div>
+
+      <div class="mod-card" data-id="random">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Random <span class="tag tag-audio">Kans</span></div>
+            <div class="mod-desc">Genereert willekeurige modulatiewaarden. Regelbaar in snelheid, smoothness en feedback — van smooth ruis tot harde S&H-sprongen. Polyfoon: elke stem krijgt zijn eigen willekeurige stroom. Voegt organisch leven toe aan statische sounds.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=SlFe0ccZTmU" class="mod-link yt" target="_blank">▶ Random — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-08-02-random-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== FASE 6 ===================== -->
+  <div class="fase fase-6" id="fase6">
+    <div class="fase-header" onclick="toggleFase(this)">
+      <div class="fase-number">6</div>
+      <div class="fase-title">
+        <h2>Fase 6 — Routing, Blending & Eurorack</h2>
+        <p>Signalen verdelen over meerdere bestemmingen, mengen, wiskundig bewerken, en hardware integreren.</p>
+      </div>
+      <div class="fase-chevron">▾</div>
+    </div>
+    <div class="fase-body">
+
+      <div class="tip-box">
+        <strong>Concept:</strong> Deze modulators zijn geen bronnen op zich — ze bewerken of verdelen bestaande modulatiesignalen. Math combineert twee signalen wiskundig; Mix crossfadet tussen twee waarden; XY/Vector verdelen één input naar meerdere outputs.
+      </div>
+
+      <div class="group-label">Signaalmenging</div>
+
+      <div class="mod-card" data-id="mix">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Mix <span class="tag tag-route">Routing</span></div>
+            <div class="mod-desc">Crossfadet tussen twee modulatiewaarden A en B. Stel A en B in als positief of negatief bedrag, en draai de Mix-knop om er tussenin te bewegen. Kan ook polyfoon, zodat elke stem zijn eigen mengverhouding heeft. Nuttig voor het vloeiend overgaan tussen twee parameter-standen.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=1sKyl-Zeg7Y" class="mod-link yt" target="_blank">▶ Mix — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-07-14-mix-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="math">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Math <span class="tag tag-route">Routing</span></div>
+            <div class="mod-desc">Combineert twee modulatiesignalen via wiskundige operaties: optellen, aftrekken, vermenigvuldigen, minimum, maximum, en quantize. Beide inputs zijn moduleerbaar met andere modulators. Maakt complexe, niet-lineaire relaties mogelijk die je anders niet kunt realiseren.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=Njd--4UsyvE" class="mod-link yt" target="_blank">▶ Math — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-07-01-math-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group-label">XY-pad en vectorverdeling</div>
+
+      <div class="mod-card" data-id="xy">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">XY <span class="tag tag-route">Routing</span></div>
+            <div class="mod-desc">Een tweedimensionaal pad met een X- en Y-as als twee afzonderlijke modulatiesignalen. Sleep het punt en je bedient twee parameters gelijktijdig. Geschikt voor live performance-modulatie waarbij je twee dimensies intuïtief wil verkennen.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=285pl-i5H-Q" class="mod-link yt" target="_blank">▶ XY, Vector-4 &amp; Vector-8 (tutorial)</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="vector48">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Vector-4 &amp; Vector-8 <span class="tag tag-route">Routing</span></div>
+            <div class="mod-desc">XY-pad die vloeiend morfet tussen 4 (of 8) volledig instelbare modulatie-setups. Elke hoek is een eigen "preset" van parameterwaarden. Sleep het punt en je morpht door vier compleet verschillende geluidsstanden. Krachtig voor live sound-morphing.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=46fV4qblkh4" class="mod-link yt" target="_blank">▶ Vector-4 &amp; 8 — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-08-10-vector-4-vector-8-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-card" data-id="select4">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">Select-4 <span class="tag tag-route">Routing</span></div>
+            <div class="mod-desc">Een slider die vloeiend morpht tussen vier modulatie-setups. Anders dan Vector-4 (tweedimensionaal XY) is Select-4 éédimensionaal — een enkele schuifregelaar met vier posities. Handig voor het automaten van preset-overgangen langs een lineaire as.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=IRS91F4KJCU" class="mod-link yt" target="_blank">▶ Select-4 — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-08-04-select-4-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+        <div class="mod-note"><strong>Vergelijk:</strong> Vector-4 = 2D XY; Select-4 = 1D schuif met 4 punten.</div>
+      </div>
+
+      <div class="group-label">Hardware integratie</div>
+
+      <div class="mod-card" data-id="hwcv">
+        <div class="mod-card-header">
+          <div class="mod-check" onclick="toggleDone(this)"></div>
+          <div class="mod-info">
+            <div class="mod-name">HW CV In <span class="tag tag-route">Eurorack</span></div>
+            <div class="mod-desc">Leest control voltage (CV) van een audio-interface-ingang en zet dit om in een modulatiesignaal in Bitwig. Hiermee kun je Eurorack-modules rechtstreeks parameters in Bitwig laten aansturen. Ondersteunt DC- en AC-koppeling afhankelijk van je interface.</div>
+            <div class="mod-links">
+              <a href="https://www.youtube.com/watch?v=-pRrXjHf0LQ" class="mod-link yt" target="_blank">▶ HW CV In — Modulator Guide</a>
+              <a href="https://polarity.me/posts/bitwig-guides/2022-06-20-hw-cv-in-bitwig-modulator-guide/" class="mod-link manual" target="_blank">📖 Polarity artikel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== BRONNEN ===================== -->
+  <div class="resources" id="bronnen">
+    <h2>📚 Leerbrönnen</h2>
+    <div class="resource-grid">
+      <a href="https://www.youtube.com/playlist?list=PLSisXiOpKF9zbKCenDSJKVeL8_TuIlP-p" class="resource-card" target="_blank">
+        <div class="rc-label">YouTube Playlist — 38 video's</div>
+        <div class="rc-title">Bitwig Modulators Explained</div>
+        <div class="rc-sub">BitwigGuide / Polarity · elke modulator apart</div>
+      </a>
+      <a href="https://polarity.me/topics/bitwig-modulators/" class="resource-card" target="_blank">
+        <div class="rc-label">Polarity Music</div>
+        <div class="rc-title">Bitwig Modulators Hub</div>
+        <div class="rc-sub">Artikelen + video's per modulator</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=WbJKjwwEIGk" class="resource-card" target="_blank">
+        <div class="rc-label">YouTube</div>
+        <div class="rc-title">Modulator Basics (Part 1/3)</div>
+        <div class="rc-sub">Het routing-systeem uitgelegd</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=ad_SCQtIq-A" class="resource-card" target="_blank">
+        <div class="rc-label">YouTube</div>
+        <div class="rc-title">Per-Voice Modulation (Part 2/3)</div>
+        <div class="rc-sub">Polyfone modulatie per stem</div>
+      </a>
+      <a href="https://polarity.me/bitwig-guides/" class="resource-card" target="_blank">
+        <div class="rc-label">Polarity Music</div>
+        <div class="rc-title">Bitwig Guides — volledig archief</div>
+        <div class="rc-sub">Alle device- en modulator-guides</div>
+      </a>
+      <a href="https://www.bitwig.com/learnings/an-introduction-to-modulators-45/" class="resource-card" target="_blank">
+        <div class="rc-label">Bitwig.com</div>
+        <div class="rc-title">Introduction to Modulators</div>
+        <div class="rc-sub">Officieel leermateriaal van Bitwig</div>
+      </a>
+    </div>
+    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <p style="font-size: 13px; color: var(--text-muted);">
+        <strong style="color: var(--text);">Handleiding:</strong>
+        <code style="background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 12px;">MANUAL_PLUS → Ch16_Modulators_Device_Nesting_and_More.html</code>
+        — open in je browser voor de volledige Bitwig v5.3 manual over modulators, verrijkt met Masterclass-aantekeningen.
+      </p>
+    </div>
+  </div>
+
+</main>
+
+
+<script>
+  // Toggle fase collapse
+  function toggleFase(header) {
+    header.parentElement.classList.toggle('collapsed');
+  }
+
+  // Toggle done state
+  function toggleDone(checkEl) {
+    const card = checkEl.closest('.mod-card');
+    card.classList.toggle('done');
+    saveProgress();
+    updateProgress();
+  }
+
+  // Save/load progress to localStorage
+  function saveProgress() {
+    const done = [];
+    document.querySelectorAll('.mod-card.done').forEach(c => done.push(c.dataset.id));
+    localStorage.setItem('bitwig_mods_progress', JSON.stringify(done));
+  }
+
+  function loadProgress() {
+    try {
+      const done = JSON.parse(localStorage.getItem('bitwig_mods_progress') || '[]');
+      done.forEach(id => {
+        const card = document.querySelector(`.mod-card[data-id="${id}"]`);
+        if (card) card.classList.add('done');
+      });
+    } catch(e) {}
+  }
+
+  function updateProgress() {
+    const total = document.querySelectorAll('.mod-card').length;
+    const done = document.querySelectorAll('.mod-card.done').length;
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `${done}/${total}`;
+  }
+
+  // Nav scroll highlighting
+  const sections = ['fase1','fase2','fase3','fase4','fase5','fase6','bronnen'];
+  function updateNav() {
+    let current = sections[0];
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 120) current = id;
+    });
+    document.querySelectorAll('nav a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', updateNav, { passive: true });
+
+  // Init
+  loadProgress();
+  updateProgress();
+</script>
+</body>
+</html>

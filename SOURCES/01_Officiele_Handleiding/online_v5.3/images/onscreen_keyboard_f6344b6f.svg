@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="19px" height="19px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect id="onscreen_keyboard" x="-0" y="0" width="19" height="19" style="fill:none;"/>
+    <g id="onscreen_keyboard1" serif:id="onscreen_keyboard">
+        <path d="M16,3L16,16L12.063,16L12.063,10.81L12.672,10.81C12.934,10.81 13.146,10.598 13.146,10.336L13.146,3L16,3ZM10.495,3L10.495,10.336C10.495,10.598 10.708,10.81 10.969,10.81L11.578,10.81L11.578,16L7.422,16L7.422,10.81L8.031,10.81C8.292,10.81 8.505,10.598 8.505,10.336L8.505,3L10.495,3ZM5.854,3L5.854,10.336C5.854,10.598 6.066,10.81 6.328,10.81L6.937,10.81L6.937,16L3,16L3,3L5.854,3Z"/>
+    </g>
+</svg>

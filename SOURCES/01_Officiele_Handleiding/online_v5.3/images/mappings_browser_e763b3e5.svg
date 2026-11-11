@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="19px" height="19px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect id="mappings_panel" x="-0" y="0" width="19" height="19" style="fill:none;"/>
+    <g id="mappings_panel1" serif:id="mappings_panel">
+        <path id="path3570" d="M6.668,16C5.749,15.486 4.629,14.939 4.305,14.133C3.539,12.229 1.942,10.091 3.123,9.419C4.305,8.909 4.185,9.879 5.487,11.273L5.487,4.182C5.487,4.182 5.487,3 6.668,3C7.85,3 7.732,4.182 7.732,4.182L7.85,10.091C7.85,7.727 7.85,6.545 9.032,6.545C10.214,6.545 10.214,7.727 10.214,10.091C10.214,7.727 10.261,7.006 11.395,6.991C12.53,6.976 12.577,8.669 12.577,11.273C12.577,8.909 12.66,7.652 13.759,7.727C15.023,7.748 14.94,11.003 14.94,11.003L14.94,14.39C14.94,14.39 14.949,15.084 14.547,15.513C14.091,16 13.597,16 13.597,16L6.668,16" style="fill-rule:nonzero;"/>
+    </g>
+</svg>

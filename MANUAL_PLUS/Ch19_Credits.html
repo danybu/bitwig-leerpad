@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>19. Credits — Bitwig Studio User Guide v5.3 (aangerijkt)</title>
+<link rel="stylesheet" href="https://assets.bitwig.net/static/gen/css_public.css?eb7d62c2">
+<link rel="stylesheet" href="_assets/inserts.css">
+</head>
+<body class="bitwig-plus">
+<header class="chapter-header">
+<h1>19. Credits</h1>
+<p class="meta">Bitwig Studio User Guide v5.3 — aangerijkt met inserts uit Polarity Music en eigen synthese. Bron: <a href="https://www.bitwig.com/userguide/latest/credits">bitwig.com/userguide/latest/credits</a></p>
+</header>
+<div id="page_content" style="padding-bottom: 100px;"><div class="content"><div class="bitwig_userguide_main"><div class="pt-4 pb-5"><div class="row"><div class="userguide-main col-12 col-lg-8"><div class="bitwig_userguide"><section class="chapter" id="credits" xml:lang=""><div class="titlepage"><div><div><h1 class="title">19. Credits</h1></div></div></div><p>The content of this user guide is subject to change without notice and does not represent a commitment on the part of Bitwig. Furthermore, Bitwig doesn't take responsibility or liability for errors or inaccuracies that may appear in this user guide. This guide and the software described in this guide are subject to a license agreement and may be used and copied only in terms of this license agreement. No part of this publication may be copied, reproduced, edited or otherwise transmitted or recorded, for any purpose, without prior written permission by Bitwig.</p><p>This user guide was written by Dave Linnenbank.</p><p>Twenty-fourth Edition, February 2025.</p></section></div></div><div class="col-12 col-lg-4 pt-5 pt-lg-0"></div></div></div></div></div><a class="btn btn-outline-primary btn-bitwig-totop" href="#" id="to-top" role="button" style="width: 25px; height: 25px; padding: 0px"><i class="fa fa-angle-up fa-"></i></a></div>
+
+<div id="edit-toolbar">
+  <button class="btn-edit" onclick="window.bitwigEdit.start()">✏️ Edit</button>
+  <button class="btn-save" onclick="window.bitwigEdit.save()" style="display:none">💾 Save</button>
+  <button class="btn-cancel" onclick="window.bitwigEdit.cancel()" style="display:none">✖️ Cancel</button>
+  <span class="edit-status" id="edit-status"></span>
+</div>
+<div id="edit-flash"></div>
+<script id="edit-script">
+window.bitwigEdit = (function() {
+  let savedHtml = null;
+  function $(id){return document.getElementById(id)}
+  function setMode(editing) {
+    document.designMode = editing ? 'on' : 'off';
+    document.body.classList.toggle('editing', editing);
+    $('edit-status').textContent = editing ? 'Edit-mode aan — typ direct in de pagina' : '';
+    document.querySelectorAll('#edit-toolbar button').forEach(b => {
+      const isSave = b.classList.contains('btn-save');
+      const isCancel = b.classList.contains('btn-cancel');
+      const isEdit = b.classList.contains('btn-edit');
+      b.style.display = ((isSave||isCancel) === editing || (isEdit && !editing)) ? 'flex' : 'none';
+    });
+  }
+  function flash(msg, color) {
+    const f = $('edit-flash');
+    f.textContent = msg;
+    if (color) f.style.background = color;
+    f.classList.add('show');
+    setTimeout(() => f.classList.remove('show'), 4500);
+  }
+  return {
+    start: function() {
+      savedHtml = document.documentElement.outerHTML;
+      setMode(true);
+      flash('Edit-mode aan. Klik 💾 Save als klaar.', '#2563EB');
+    },
+    cancel: function() {
+      if (!confirm('Wijzigingen verwerpen en herladen?')) return;
+      setMode(false);
+      location.reload();
+    },
+    save: function() {
+      setMode(false);
+      // Clone, strip toolbar + contenteditable artifacts
+      const clone = document.documentElement.cloneNode(true);
+      clone.querySelector('#edit-toolbar')?.remove();
+      clone.querySelector('#edit-flash')?.remove();
+      clone.querySelector('#edit-script')?.remove();
+      clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+      clone.querySelectorAll('.editing').forEach(el => el.classList.remove('editing'));
+      // Reconstrueer full HTML
+      const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+      // Download met dezelfde filename
+      const fname = decodeURIComponent(location.pathname.split('/').pop()) || 'edited.html';
+      const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fname;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      flash('💾 Gedownload als ' + fname + ' — sleep uit Downloads naar je Dropbox MANUAL_PLUS map om de oude versie te overschrijven.', '#16A34A');
+    }
+  };
+})();
+</script>
+
+</body>
+</html>
