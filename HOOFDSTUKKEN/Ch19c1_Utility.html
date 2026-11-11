@@ -600,7 +600,8 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
   function onSel(){
     if(!MAIN)return;
     var s=window.getSelection();if(!s||s.isCollapsed||!s.rangeCount){if(pending){pending=null;hidePop()}return}
-    var an=anchorFrom(s.getRangeAt(0));if(!an){hidePop();return}
+    var rr=s.getRangeAt(0),rc=rr.getBoundingClientRect();if(!rc.width&&!rc.height){hidePop();return}
+    var an=anchorFrom(rr);if(!an){hidePop();return}
     pending=an;
     showPop(s.getRangeAt(0).getBoundingClientRect(),'<button type="button" data-a="hl">🖍 Markeer</button><button type="button" data-a="nt">✎ Notitie</button>',function(a){
       var an=pending;pending=null;s.removeAllRanges();hidePop();if(an)create(an,a==='nt')});
@@ -615,6 +616,10 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
     while(a>0&&/\S/.test(d[a-1]))a--;while(b<d.length&&/\S/.test(d[b]))b++;
     if(b<=a)return null;var w=document.createRange();w.setStart(n,a);w.setEnd(n,b);return w;
   }
+  function reset(){pending=null;hidePop();try{var s=window.getSelection();if(s&&!s.isCollapsed&&s.rangeCount&&!(MAIN&&MAIN.contains(s.anchorNode)&&s.anchorNode.parentElement&&s.anchorNode.parentElement.offsetParent))s.removeAllRanges()}catch(e){}}
+  ['hashchange','popstate','pageshow','pagehide'].forEach(function(ev){window.addEventListener(ev,reset)});
+  document.addEventListener('visibilitychange',reset);
+  document.addEventListener('click',function(e){if(e.target.closest('#prev,#next,#skip,.toc a,a.chap-a'))reset()},true);
   var tm=null;document.addEventListener('selectionchange',function(){clearTimeout(tm);tm=setTimeout(onSel,250)});
   document.addEventListener('click',function(e){
     var n=e.target.closest('.lp-note');
@@ -686,7 +691,7 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
     '.lp-ind{margin-left:6px;font-size:.85em;text-decoration:none!important;font-weight:400}'+
     '.hl-pop{position:absolute;z-index:9999;background:#222;border-radius:8px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.3);display:flex}'+
     '.hl-pop button{font:600 .85rem/1.2 system-ui,sans-serif;color:#fff;background:transparent;border:0;padding:6px 10px;cursor:pointer;white-space:nowrap}'+
-    '.hl-pop button+button{border-left:1px solid #444}';
+    '.hl-pop button+button{border-left:1px solid #444}.hl-pop[hidden]{display:none!important}';
   document.head.appendChild(css);
   function init(){document.body.appendChild(pop);paint();restore();chapterDone()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
