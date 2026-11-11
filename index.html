@@ -581,4 +581,19 @@ details.ex.new{background:transparent;border-radius:0;padding:0}
     if(pg)pg.textContent=n?(n===ids.length?'✓ helemaal afgewerkt':n+' van '+ids.length+' delen afgewerkt'):'';
   });
 })();
+(function(){ /* naast elk hoofdstuk: in één keer helemaal afgewerkt aantikken */
+  var st=document.createElement('style');st.textContent='.chaps li{position:relative}.hf-klaar{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted,#777);margin:4px 0 10px 4px;cursor:pointer;width:max-content}.hf-klaar input{width:18px;height:18px;accent-color:var(--a,#2a9d5c);cursor:pointer}.hf-klaar.on{color:var(--a,#2a9d5c);font-weight:600}';
+  document.head.appendChild(st);
+  document.querySelectorAll('a.chap-a').forEach(function(a){
+    var ids=(a.dataset.ids||'').split(' ').filter(Boolean),K='leerpad-afgewerkt-'+a.dataset.part;
+    function done(){try{return JSON.parse(localStorage.getItem(K)||'{}')||{}}catch(e){return {}}}
+    var lab=document.createElement('label');lab.className='hf-klaar';lab.innerHTML='<input type="checkbox"> <span>hoofdstuk afgewerkt</span>';
+    var cb=lab.querySelector('input');
+    function sync(){var d=done(),all=ids.length&&ids.every(function(i){return d[i]});cb.checked=!!all;lab.classList.toggle('on',!!all);
+      var pg=a.querySelector('.pg'),n=ids.filter(function(i){return d[i]}).length;if(pg)pg.textContent=n?(n===ids.length?'✓ helemaal afgewerkt':n+' van '+ids.length+' delen afgewerkt'):''}
+    cb.addEventListener('change',function(){var d=done();ids.forEach(function(i){if(cb.checked)d[i]=1;else delete d[i]});
+      try{if(Object.keys(d).length)localStorage.setItem(K,JSON.stringify(d));else localStorage.removeItem(K)}catch(e){}sync()});
+    a.parentNode.insertBefore(lab,a.nextSibling);sync();
+  });
+})();
 </script></body></html>

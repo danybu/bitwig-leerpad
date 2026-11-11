@@ -656,6 +656,17 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
     });
   }
 
+
+  /* ---------------- hoofdstuk in één keer afgewerkt (onder "x van y delen afgewerkt") ---------------- */
+  function chapterDone(){
+    var dc=document.getElementById('donecount');if(!dc||document.getElementById('hf-klaar'))return;
+    var ids=[].slice.call(document.querySelectorAll('section.page')).map(function(s){return s.id}),K='leerpad-afgewerkt-'+(document.body.dataset.chapter||'x');
+    var d=get(K,{}),all=ids.length&&ids.every(function(i){return d[i]});
+    var lab=document.createElement('label');lab.id='hf-klaar';lab.className='lp-x';lab.style.cssText='display:flex;align-items:center;gap:6px;font-size:.8rem;margin:2px 0 6px;cursor:pointer';
+    lab.innerHTML='<input type="checkbox" style="width:16px;height:16px;cursor:pointer"'+(all?' checked':'')+'> hele hoofdstuk afgewerkt';
+    lab.querySelector('input').addEventListener('change',function(e){var d=get(K,{});ids.forEach(function(i){if(e.target.checked)d[i]=1;else delete d[i]});put(K,d);location.reload()});
+    dc.parentNode.insertBefore(lab,dc.nextSibling);
+  }
   var css=document.createElement('style');css.textContent=
     '.mk-btns{display:inline-flex;gap:2px;margin-left:6px;vertical-align:middle;opacity:.35;transition:opacity .15s}'+
     'tr:hover .mk-btns,li:hover .mk-btns,.mk-btns:has(.on){opacity:1}@media (hover:none){.mk-btns{opacity:.6}}'+
@@ -677,7 +688,7 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
     '.hl-pop button{font:600 .85rem/1.2 system-ui,sans-serif;color:#fff;background:transparent;border:0;padding:6px 10px;cursor:pointer;white-space:nowrap}'+
     '.hl-pop button+button{border-left:1px solid #444}';
   document.head.appendChild(css);
-  function init(){document.body.appendChild(pop);paint();restore()}
+  function init(){document.body.appendChild(pop);paint();restore();chapterDone()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 (function(){
