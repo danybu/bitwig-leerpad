@@ -380,6 +380,8 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
     if(!token())return Promise.resolve();
     return fetchRemote().then(function(r){
       sha=r.sha;
+      var rn=r.data&&r.data.sleutels?Object.keys(r.data.sleutels).length:0, ln=Object.keys(snapshot()).length;
+      if(rn===0&&ln>0){return push()}   // een lege voortgang overschrijft nooit bestaande voortgang
       if(r.data&&r.data.sleutels&&(r.data.bewaard||0)>stamp()){
         adopt(r.data);lastSaved=new Date(r.data.bewaard);state='ok';ui();
         if(reloadOk&&!sessionStorage.getItem('leerpad-herladen')){sessionStorage.setItem('leerpad-herladen','1');location.reload();return}
@@ -392,7 +394,7 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
     if(!token())return Promise.resolve();
     if(busy){again=true;return Promise.resolve()}
     busy=true;
-    var data={versie:2,bewaard:stamp()||Date.now(),sleutels:snapshot()};
+    var snap=snapshot(),data={versie:2,bewaard:Object.keys(snap).length?(stamp()||Date.now()):0,sleutels:snap};
     function put(){
       var body={message:'voortgang',content:b64e(JSON.stringify(data,null,1))};if(sha)body.sha=sha;
       return fetch(API,{method:'PUT',headers:hdr(),body:JSON.stringify(body)}).then(function(r){
@@ -406,7 +408,7 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
       if(res!=='stale')return res;
       // intussen elders bewaard: is dat nieuwer, dan overnemen; anders overschrijven
       return fetchRemote().then(function(r){sha=r.sha;
-        if(r.data&&(r.data.bewaard||0)>data.bewaard){adopt(r.data);return 'reload'}
+        if(r.data&&(r.data.bewaard||0)>data.bewaard&&Object.keys(r.data.sleutels||{}).length){adopt(r.data);return 'reload'}
         return put()});
     }).then(function(res){
       busy=false;if(res==='reload'){location.reload();return}
