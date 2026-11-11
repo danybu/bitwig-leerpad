@@ -345,21 +345,22 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
 /* Voortgang delen tussen al je browsers (Mac, iPhone, Readdle Documents …).
    De pagina's werken met localStorage; dit script spiegelt de voortgangssleutels naar voortgang.json
    in je privé-repo danybu/bitwig-voortgang (GitHub). Per toestel vul je één keer een GitHub-token in.
-   Het nieuwste wint: bij openen en bij terugkeren naar de pagina wordt opgehaald, na elke wijziging bewaard. */
+   Per sleutel wint het nieuwste (samengevoegd bij de eerste koppeling): bij openen en bij terugkeren naar de pagina wordt opgehaald, na elke wijziging bewaard. */
 (function(){
   var KEYS=/^(bitwig-leerpad-gezien|leerpad-afgewerkt-|bw-quiz-v1|sc-view|leerpad-alles|leerpad-hl-|leerpad-hlc-|leerpad-sc-mark)/, STAMP='leerpad-sync-stamp',
       TOK='leerpad-gh-token', REPO='danybu/bitwig-voortgang', PATH='voortgang.json',
       API='https://api.github.com/repos/'+REPO+'/contents/'+PATH;
   function ls(){try{return window.localStorage}catch(e){return null}}
   var L=ls(); if(!L)return;
-  var timer=null, state='', lastSaved=null, sha=null, busy=false, again=false, form=false;
+  var timer=null, state='', lastSaved=null, sha=null, busy=false, again=false, form=false, TK='leerpad-sync-t';
   function token(){return L.getItem(TOK)||''}
   function snapshot(){var d={};for(var i=0;i<L.length;i++){var k=L.key(i);if(KEYS.test(k))d[k]=L.getItem(k)}return d}
   function stamp(){return +(L.getItem(STAMP)||0)}
+  function times(){try{return JSON.parse(L.getItem(TK)||'{}')||{}}catch(e){return {}}}
   var orig=Storage.prototype.setItem, origRm=Storage.prototype.removeItem;
-  function touched(k){if(KEYS.test(k)){orig.call(L,STAMP,String(Date.now()));schedule()}}
-  Storage.prototype.setItem=function(k,v){orig.call(this,k,v);if(this===L)touched(k)};
-  Storage.prototype.removeItem=function(k){origRm.call(this,k);if(this===L)touched(k)};
+  function touched(k){if(KEYS.test(k)){var t=times(),n=Date.now();t[k]=n;orig.call(L,TK,JSON.stringify(t));orig.call(L,STAMP,String(n));schedule()}}
+  Storage.prototype.setItem=function(k,v){var old=this===L?L.getItem(k):null;orig.call(this,k,v);if(this===L&&old!==String(v))touched(k)};
+  Storage.prototype.removeItem=function(k){var had=this===L&&L.getItem(k)!==null;origRm.call(this,k);if(had)touched(k)};
   function b64e(s){return btoa(unescape(encodeURIComponent(s)))}
   function b64d(s){return decodeURIComponent(escape(atob(s.replace(/\n/g,''))))}
   function hdr(){return {'Authorization':'Bearer '+token(),'Accept':'application/vnd.github+json'}}
@@ -371,51 +372,67 @@ window.QUIZ_CAT={"o": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRX
       return r.json().then(function(j){var d=null;try{d=JSON.parse(b64d(j.content))}catch(e){}return {sha:j.sha,data:d}});
     });
   }
-  function adopt(d){
-    Object.keys(snapshot()).forEach(function(k){if(!(k in d.sleutels))origRm.call(L,k)});
-    Object.keys(d.sleutels).forEach(function(k){orig.call(L,k,d.sleutels[k])});
-    orig.call(L,STAMP,String(d.bewaard));
+  // twee waarden samenvoegen (alleen als niet duidelijk is welke nieuwer is, bv. bij de eerste koppeling)
+  function union(a,b){ // a krijgt voorrang bij botsingen
+    var A,B;try{A=JSON.parse(a);B=JSON.parse(b)}catch(e){return a}
+    function u(x,y){
+      if(Array.isArray(x)&&Array.isArray(y)){
+        var out=x.slice(),seen={};x.forEach(function(v){seen[v&&v.id?'#'+v.id:JSON.stringify(v)]=1});
+        y.forEach(function(v){var k=v&&v.id?'#'+v.id:JSON.stringify(v);if(!seen[k]){seen[k]=1;out.push(v)}});return out}
+      if(x&&y&&typeof x==='object'&&typeof y==='object'&&!Array.isArray(x)&&!Array.isArray(y)){
+        var o={};Object.keys(y).forEach(function(k){o[k]=y[k]});Object.keys(x).forEach(function(k){o[k]=(k in y)?u(x[k],y[k]):x[k]});return o}
+      return x}
+    return JSON.stringify(u(A,B));
   }
-  function pull(reloadOk){
-    if(!token())return Promise.resolve();
-    return fetchRemote().then(function(r){
-      sha=r.sha;
-      var rn=r.data&&r.data.sleutels?Object.keys(r.data.sleutels).length:0, ln=Object.keys(snapshot()).length;
-      if(rn===0&&ln>0){return push()}   // een lege voortgang overschrijft nooit bestaande voortgang
-      if(r.data&&r.data.sleutels&&(r.data.bewaard||0)>stamp()){
-        adopt(r.data);lastSaved=new Date(r.data.bewaard);state='ok';ui();
-        if(reloadOk&&!sessionStorage.getItem('leerpad-herladen')){sessionStorage.setItem('leerpad-herladen','1');location.reload();return}
-      }else if(!r.data||(r.data.bewaard||0)<stamp()){return push()}
-      else{lastSaved=new Date(r.data.bewaard);state='ok';ui()}
-      sessionStorage.removeItem('leerpad-herladen');
-    }).catch(function(e){state=e==='token'?'token':'fout';ui()});
+  // per sleutel: de nieuwste wint; weggehaalde sleutels onthouden we met hun tijd
+  function merge(d){
+    var lv=snapshot(),lt=times(),rv=(d&&d.sleutels)||{},rt=(d&&d.t)||{},rw=(d&&d.weg)||{};
+    var keys={};[lv,lt,rv,rw].forEach(function(o){Object.keys(o).forEach(function(k){if(KEYS.test(k))keys[k]=1})});
+    var out={sleutels:{},t:{},weg:{}},setL={},delL={};
+    Object.keys(keys).forEach(function(k){
+      var a=(k in lv)?lv[k]:null, ta=lt[k]||0, b=(k in rv)?rv[k]:null, tb=rt[k]||rw[k]||0, v, t;
+      if(a!==null&&b!==null&&(ta===0||tb===0)&&a!==b){v=ta>=tb?union(a,b):union(b,a);t=Math.max(ta,tb)}
+      else if(ta>tb||(ta===tb&&a!==null)){v=a;t=ta}
+      else{v=b;t=tb}
+      if(v===null){out.weg[k]=t||Date.now()}else{out.sleutels[k]=v;out.t[k]=t}
+      if(v!==a){if(v===null)delL[k]=1;else setL[k]=v}
+    });
+    return {out:out,setL:setL,delL:delL};
   }
-  function push(){
+  function same(d,o){if(!d||!d.sleutels)return Object.keys(o.sleutels).length===0&&Object.keys(o.weg).length===0;
+    var a=d.sleutels,b=o.sleutels,ka=Object.keys(a),kb=Object.keys(b);if(ka.length!==kb.length)return false;
+    for(var i=0;i<kb.length;i++)if(a[kb[i]]!==b[kb[i]])return false;
+    return JSON.stringify(d.weg||{})===JSON.stringify(o.weg);}
+  function sync(reloadOk){
     if(!token())return Promise.resolve();
     if(busy){again=true;return Promise.resolve()}
     busy=true;
-    var snap=snapshot(),data={versie:2,bewaard:Object.keys(snap).length?(stamp()||Date.now()):0,sleutels:snap};
-    function put(){
-      var body={message:'voortgang',content:b64e(JSON.stringify(data,null,1))};if(sha)body.sha=sha;
-      return fetch(API,{method:'PUT',headers:hdr(),body:JSON.stringify(body)}).then(function(r){
-        if(r.status===409||r.status===422)return 'stale';
-        if(r.status===401||r.status===403)throw 'token';
-        if(!r.ok)throw 'net';
-        return r.json().then(function(j){sha=j.content.sha;return 'ok'});
+    function round(tries){
+      return fetchRemote().then(function(r){
+        sha=r.sha;var m=merge(r.data),lt=times(),changed=false;
+        Object.keys(m.setL).forEach(function(k){orig.call(L,k,m.setL[k]);lt[k]=m.out.t[k];changed=true});
+        Object.keys(m.delL).forEach(function(k){origRm.call(L,k);lt[k]=m.out.weg[k];changed=true});
+        if(changed)orig.call(L,TK,JSON.stringify(lt));
+        if(same(r.data,m.out))return changed;
+        var data={versie:3,bewaard:Date.now(),sleutels:m.out.sleutels,t:m.out.t,weg:m.out.weg};
+        var body={message:'voortgang',content:b64e(JSON.stringify(data,null,1))};if(sha)body.sha=sha;
+        return fetch(API,{method:'PUT',headers:hdr(),body:JSON.stringify(body)}).then(function(p){
+          if((p.status===409||p.status===422)&&tries>0)return round(tries-1).then(function(c){return c||changed});
+          if(p.status===401||p.status===403)throw 'token';
+          if(!p.ok)throw 'net';
+          return p.json().then(function(j){sha=j.content.sha;return changed});
+        });
       });
     }
-    return put().then(function(res){
-      if(res!=='stale')return res;
-      // intussen elders bewaard: is dat nieuwer, dan overnemen; anders overschrijven
-      return fetchRemote().then(function(r){sha=r.sha;
-        if(r.data&&(r.data.bewaard||0)>data.bewaard&&Object.keys(r.data.sleutels||{}).length){adopt(r.data);return 'reload'}
-        return put()});
-    }).then(function(res){
-      busy=false;if(res==='reload'){location.reload();return}
-      if(res==='stale'){state='fout';ui();return}
-      lastSaved=new Date();state='ok';ui();if(again){again=false;push()}
+    return round(2).then(function(changed){
+      busy=false;lastSaved=new Date();state='ok';ui();
+      if(changed&&reloadOk&&!sessionStorage.getItem('leerpad-herladen')){sessionStorage.setItem('leerpad-herladen','1');location.reload();return}
+      sessionStorage.removeItem('leerpad-herladen');
+      if(again){again=false;sync(false)}
     }).catch(function(e){busy=false;state=e==='token'?'token':'fout';ui()});
   }
+  function pull(reloadOk){return sync(reloadOk)}
+  function push(){return sync(false)}
   function schedule(){if(!token())return;clearTimeout(timer);timer=setTimeout(function(){timer=null;push()},1200)}
   function exportFile(){var b=new Blob([JSON.stringify({versie:2,bewaard:stamp()||Date.now(),sleutels:snapshot()},null,1)],{type:'application/json'});
     var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='voortgang.json';document.body.appendChild(a);a.click();a.remove()}
